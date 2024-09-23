@@ -8,7 +8,7 @@
 
 int sc_main(int argc, char *argv[])
 {
-        using namespace sc_core;
+    using namespace sc_core;
 	using namespace soclib::caba;
 
 	/////////////////////////////////////////////////////////////////
@@ -22,16 +22,16 @@ int sc_main(int argc, char *argv[])
 	/////////////////////////////////////////////////////////////////
         // Signals
 	/////////////////////////////////////////////////////////////////
-        sc_clock                		signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
-        sc_signal<bool> 			signal_resetn("signal_resetn");
-        FifoSignals<uint32_t> 			signal_fifo_m2c("signal_m2c");
-	A COMPLETER
+    sc_clock                		signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
+    sc_signal<bool> 			signal_resetn("signal_resetn");
+    FifoSignals<uint32_t> 			signal_fifo_m2c("signal_m2c");
+	FifoSignals<uint32_t> 			signal_fifo_c2m("signal_c2m");
 
-	/////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////g++ -Wno-deprecated -fpermissive -std=gnu++0x -I. -I/users/outil/dsx/cctools/include -m32 -c  tp1_top.cpp
 	// Components
 	/////////////////////////////////////////////////////////////////
-        FifoGcdMaster 				master(A COMPLETER);
-	FifoGcdCoprocessor			coproc(A COMPLETER);
+    FifoGcdMaster 				master("fifo_gcd_master", seed);
+	FifoGcdCoprocessor			coproc("fifo_gcd_coprocessor");
 
 	/////////////////////////////////////////////////////////////////
 	// Net-List
@@ -40,12 +40,16 @@ int sc_main(int argc, char *argv[])
 	master.p_resetn(signal_resetn);
 	master.p_in(signal_fifo_c2m);
 	master.p_out(signal_fifo_m2c);
-	A COMPLETER
+	
+	coproc.p_clk(signal_clk);
+	coproc.p_resetn(signal_resetn);
+	coproc.p_in(signal_fifo_m2c);
+	coproc.p_out(signal_fifo_c2m);
 
 	/////////////////////////////////////////////////////////////////
 	// simulation
 	/////////////////////////////////////////////////////////////////
-	sc_start(0;
+	sc_start(0);
 
 	signal_resetn = false;
 	sc_start( sc_time( 1, SC_NS ) ) ;

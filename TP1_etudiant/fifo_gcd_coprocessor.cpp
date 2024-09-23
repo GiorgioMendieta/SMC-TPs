@@ -61,42 +61,46 @@ FifoGcdCoprocessor::~FifoGcdCoprocessor( )
 void FifoGcdCoprocessor::transition()
 {
 	if ( !p_resetn.read() ) {
-		r_fsm = A COMPLETER
+		r_fsm = READ_OPA;
 		return;
 	}
 
 	switch ( r_fsm.read() ) {
 	case READ_OPA :
 		if ( p_in.rok.read() ) {
-			r_opa = A COMPETER
-			r_fsm = A COMPLETER
+			r_opa = p_in.rok.read();
+			r_fsm = READ_OPB;
 		}
 		break;
 	case READ_OPB :
 		if ( p_in.rok.read() ) {
-			r_opb = A COMPLETER
-			r_fsm = A COMPLETER
+			r_opb = p_in.rok.read();
+			r_fsm = COMPARE;
 		}
 		break;
 	case COMPARE:
-		if      ( r_opa.read() < r_opb.read() )  r_fsm = A COMPLETER
-		else if ( r_opa.read() > r_opb.read() )  r_fsm = A COMPLETER
-		else                                     r_fsm = A COMPLETER
+		if      ( r_opa.read() < r_opb.read() ) {
+		 	r_fsm = DECR_B;
+		}
+		else if ( r_opa.read() > r_opb.read() ) {
+			  r_fsm = DECR_A;
+		}
+		else r_fsm = WRITE_RES;
 		break;
 	case DECR_A :
-	    r_opa = A COMPLETER
-	    r_fsm = A COMPLETER
-	break;
+	    r_opa = r_opa.read()-r_opb.read();
+	    r_fsm = COMPARE;
+		break;
 	case DECR_B :
-	    r_opb = A COMPLETER
-	    r_fsm = A COMPLETER
-	break;
+	    r_opb = r_opb.read()-r_opa.read();
+	    r_fsm = COMPARE;
+		break;
 	case WRITE_RES :
 		if ( p_out.wok.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = READ_OPA;
 		}
 		break;
-        } // end switch
+    } // end switch
 } // end transition()
 
 ///////////////////////////////////
@@ -104,23 +108,23 @@ void FifoGcdCoprocessor::genMoore()
 {
 	switch ( r_fsm.read() ) {
 	case READ_OPA : 
-        case READ_OPB :
-		p_in.r 		= A COMPLETER
-		p_out.w		= A COMPLETER
-                p_out.data	= A COMPLETER
-	break; 
+    case READ_OPB :
+		p_in.r 		= true;
+		p_out.w		= false;
+		p_out.data	= 0;
+		break; 
 	case COMPARE :
 	case DECR_A :
 	case DECR_B :
-		p_in.r 		= A COMPLETER
-		p_out.w		= A COMPLETER
-                p_out.data	= A COMPLETER
-	break; 
+		p_in.r 		= false;
+		p_out.w		= false;
+		p_out.data	= 0;
+		break; 
 	case WRITE_RES :
-		p_in.r 		= A COMPLETER
-		p_out.w		= A COMPLETER
-                p_out.data	= A COMPLETER
-	break; 
+		p_in.r 		= false;
+		p_out.w		= true;
+		p_out.data	= r_opa.read();
+		break; 
      } // end switch
 } // end genMoore()
 
