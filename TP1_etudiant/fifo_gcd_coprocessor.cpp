@@ -73,14 +73,14 @@ namespace soclib
 			case READ_OPA:
 				if (p_in.rok.read())
 				{
-					r_opa = p_in.rok.read();
+					r_opa = p_in.data.read();
 					r_fsm = READ_OPB;
 				}
 				break;
 			case READ_OPB:
 				if (p_in.rok.read())
 				{
-					r_opb = p_in.rok.read();
+					r_opb = p_in.data.read();
 					r_fsm = COMPARE;
 				}
 				break;
@@ -134,7 +134,7 @@ namespace soclib
 			case WRITE_RES:
 				p_in.r = false;
 				p_out.w = true;
-				p_out.data = r_opa.read();
+				p_out.data = r_opa;
 				break;
 			} // end switch
 		} // end genMoore()
