@@ -79,8 +79,8 @@ namespace soclib
 			{
 			case RANDOM:
 				r_iterationcount = r_iterationcount.read() + 1;
-				r_opa = rand() % 1000; // Limité le rang
-				r_opb = rand() % 500;
+				r_opa = rand();
+				r_opb = rand();
 				r_fsm = WRITE_OPA;
 				break;
 

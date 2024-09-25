@@ -4,6 +4,7 @@ CCTOOLS=/users/outil/dsx/cctools/include
 CCTOOLS_FAST=/users/outil/dsx/systemcass/include
 
 all: simulator fast_simulator
+	@echo "Don't forget to ssh into berlioz !!!!"
 
 fifo_gcd_master:
 	${CC} ${CFLAGS} -std=gnu++0x -I. -I${CCTOOLS} -m32 -c fifo_gcd_master.cpp
