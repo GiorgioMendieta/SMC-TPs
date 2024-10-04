@@ -63,11 +63,11 @@ class VciGcdCoprocessor
 	// Registers
 	sc_core::sc_signal<int>					r_vci_fsm;
 	sc_core::sc_signal<int>					r_exe_fsm;
-        sc_core::sc_signal<typename vci_param::srcid_t> 	r_srcid;
-        sc_core::sc_signal<typename vci_param::trdid_t> 	r_trdid;
-        sc_core::sc_signal<typename vci_param::pktid_t> 	r_pktid;
-        sc_core::sc_signal<typename vci_param::data_t>   	r_opa;
-        sc_core::sc_signal<typename vci_param::data_t>   	r_opb;
+    sc_core::sc_signal<typename vci_param::srcid_t> 	r_srcid;
+    sc_core::sc_signal<typename vci_param::trdid_t> 	r_trdid;
+    sc_core::sc_signal<typename vci_param::pktid_t> 	r_pktid;
+    sc_core::sc_signal<typename vci_param::data_t>   	r_opa;
+    sc_core::sc_signal<typename vci_param::data_t>   	r_opb;
 
 	soclib::common::Segment 				m_segment;
 

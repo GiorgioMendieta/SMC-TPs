@@ -263,7 +263,7 @@ void VciVgsb<vci_param>::genMealy_rspack()
     }
 } // end genMealy_rspack()
 
-template class VciVgsb<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> >;
+template class VciVgsb<soclib::caba::VciParams<4, 4, 32, 1, 1, 1, 12, 1, 1, 1> >;
 
 }} // end namespace
 

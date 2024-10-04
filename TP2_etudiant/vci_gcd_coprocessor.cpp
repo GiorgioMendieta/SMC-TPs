@@ -57,11 +57,11 @@ VciGcdCoprocessor<vci_param>::VciGcdCoprocessor(sc_module_name insname,
 {
 	SC_METHOD(transition);
 	dont_initialize();
-	sensitive << A COMPLETER
+	sensitive << p_clk.pos();
 	
 	SC_METHOD(genMoore);
 	dont_initialize();
-	sensitive << A COMPLETER
+	sensitive << p_clk.neg();
 }
 
 ////////////////////////////
@@ -75,8 +75,8 @@ template<typename vci_param>
 void VciGcdCoprocessor<vci_param>::transition()
 {
 	if ( !p_resetn.read() ) {
-		r_vci_fsm = RANDOM;
-		r_exe_fsm = EXE_IDLE; // à vérifier
+		r_vci_fsm = VCI_GET_CMD;
+		r_exe_fsm = EXE_IDLE; // c'est vérifié
 		return;
 	}
 
@@ -97,11 +97,11 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 		else					r_exe_fsm = EXE_IDLE;
 		break;
 	case EXE_DECA:
-		r_opa     = opa_reg - opb_reg;
+		r_opa     = r_opa.read() - r_opb.read();
 		r_exe_fsm = EXE_COMPARE;
 		break;
 	case EXE_DECB:
-		r_opb     = opb_reg - opa_reg;
+		r_opb     = r_opb.read() - r_opa.read();
 		r_exe_fsm = EXE_COMPARE;
 		break;
 	} // end switch exe-fsm
@@ -113,12 +113,14 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 			typename vci_param::addr_t address = p_vci.address.read();
 			uint32_t cell  = ( address - m_segment.baseAddress() ) / vci_param::B;
 			// only accepts single word requests & checks for segmentation violations
-			assert ( ( p_vci.eop.read() ) && 
-			 	 ( p_vci.plen.read() == 4 ) &&
-				 ( p_vci.cmd.read() != vci_param::CMD_LOCKED_READ ) &&
-				 ( p_vci.cmd.read() != vci_param::CMD_STORE_COND ) &&
-			 	 ( m_segment.contains(address) ) &&
-                         	   "illegal command received by the GCD coprocessor");
+			assert   ( (p_vci.eop.read()) );
+			assert 	 ( p_vci.plen.read() == 4 );
+			assert	 ( p_vci.cmd.read() != vci_param::CMD_LOCKED_READ );
+			assert	 ( p_vci.cmd.read() != vci_param::CMD_STORE_COND );
+			assert 	 ( m_segment.contains(address) );
+			
+			
+
 			// store the VCI command in registers
 			r_srcid	= p_vci.srcid.read();
 			r_trdid	= p_vci.trdid.read();
@@ -129,14 +131,14 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_READ ) && ( cell == GCD_STATUS ) ) {
 				r_vci_fsm = VCI_RSP_STATUS;
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_OPA ) ) {
-				r_opa     = opa_reg;
+				r_opa     = p_vci.wdata.read();
 				r_vci_fsm = VCI_RSP_OPA;
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_OPB ) ) {
-				r_opb     = opb_reg;
+				r_opb     = p_vci.wdata.read();
 				r_vci_fsm = VCI_RSP_OPB;
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_START ) ) {
 				r_vci_fsm = VCI_RSP_START;
-			} else {	
+			} else {
 				std::cout << "illegal command to the GCD coprocessor" << std::endl;
 				exit(0);
 			}
@@ -173,7 +175,7 @@ void VciGcdCoprocessor<vci_param>::genMoore()
 	case VCI_RSP_OPB:
 	case VCI_RSP_START:
 		p_vci.cmdack = false;
-		p_vci.rspval = false;
+		p_vci.rspval = true;
 		p_vci.rdata  = 0;
 		break;
 	case VCI_RSP_STATUS:
@@ -188,7 +190,7 @@ void VciGcdCoprocessor<vci_param>::genMoore()
 	}
 } // end genMoore()
 
-template class VciGcdCoprocessor<soclib::caba::VciParams<4,8,32,1,1,1,12,1,1,1>>;
+template class VciGcdCoprocessor<soclib::caba::VciParams<4,4,32,1,1,1,12,1,1,1>>;
 
 }}
 
