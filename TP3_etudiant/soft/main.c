@@ -26,6 +26,7 @@ __attribute__((constructor)) void  main()
 		};
 		gcd_get_status(&status);
 		while(status){
+			tty_printf("Calculating\n");
 			gcd_get_status(&status);
 		};
 		gcd_get_result(&res);
@@ -34,7 +35,7 @@ __attribute__((constructor)) void  main()
 		tty_printf("Numéro d'itération fin: %d\n", iteration);
 		
 		tty_printf("res: %d\n", res);
-		tty_printf("-----------------------\n");
+		tty_printf("\n\n");
 		tty_getc(&byte);
 	}
 
