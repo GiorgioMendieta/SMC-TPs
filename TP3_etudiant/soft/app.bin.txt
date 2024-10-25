@@ -1343,61 +1343,55 @@ Disassembly of section seg_code:
   4013cc:	244400f0 	addiu	a0,v0,240
   4013d0:	0c1001ea 	jal	4007a8 <tty_printf>
   4013d4:	00000000 	nop
-  4013d8:	27c20028 	addiu	v0,s8,40
-  4013dc:	00402025 	move	a0,v0
-  4013e0:	0c100387 	jal	400e1c <gcd_get_status>
-  4013e4:	00000000 	nop
-  4013e8:	10000005 	b	401400 <main+0x118>
-  4013ec:	00000000 	nop
-  4013f0:	27c20028 	addiu	v0,s8,40
-  4013f4:	00402025 	move	a0,v0
-  4013f8:	0c100387 	jal	400e1c <gcd_get_status>
-  4013fc:	00000000 	nop
-  401400:	8fc20028 	lw	v0,40(s8)
-  401404:	1440fffa 	bnez	v0,4013f0 <main+0x108>
+  4013d8:	00000000 	nop
+  4013dc:	27c20028 	addiu	v0,s8,40
+  4013e0:	00402025 	move	a0,v0
+  4013e4:	0c100387 	jal	400e1c <gcd_get_status>
+  4013e8:	00000000 	nop
+  4013ec:	1440fffb 	bnez	v0,4013dc <main+0xf4>
+  4013f0:	00000000 	nop
+  4013f4:	27c20024 	addiu	v0,s8,36
+  4013f8:	00402025 	move	a0,v0
+  4013fc:	0c10039a 	jal	400e68 <gcd_get_result>
+  401400:	00000000 	nop
+  401404:	0c100025 	jal	400094 <proctime>
   401408:	00000000 	nop
-  40140c:	27c20024 	addiu	v0,s8,36
-  401410:	00402025 	move	a0,v0
-  401414:	0c10039a 	jal	400e68 <gcd_get_result>
-  401418:	00000000 	nop
-  40141c:	0c100025 	jal	400094 <proctime>
+  40140c:	afc20014 	sw	v0,20(s8)
+  401410:	8fc50014 	lw	a1,20(s8)
+  401414:	3c020100 	lui	v0,0x100
+  401418:	244400fc 	addiu	a0,v0,252
+  40141c:	0c1001ea 	jal	4007a8 <tty_printf>
   401420:	00000000 	nop
-  401424:	afc20014 	sw	v0,20(s8)
-  401428:	8fc50014 	lw	a1,20(s8)
-  40142c:	3c020100 	lui	v0,0x100
-  401430:	244400fc 	addiu	a0,v0,252
-  401434:	0c1001ea 	jal	4007a8 <tty_printf>
-  401438:	00000000 	nop
-  40143c:	8fc50010 	lw	a1,16(s8)
+  401424:	8fc50010 	lw	a1,16(s8)
+  401428:	3c020100 	lui	v0,0x100
+  40142c:	24440118 	addiu	a0,v0,280
+  401430:	0c1001ea 	jal	4007a8 <tty_printf>
+  401434:	00000000 	nop
+  401438:	8fc20024 	lw	v0,36(s8)
+  40143c:	00402825 	move	a1,v0
   401440:	3c020100 	lui	v0,0x100
-  401444:	24440118 	addiu	a0,v0,280
+  401444:	24440138 	addiu	a0,v0,312
   401448:	0c1001ea 	jal	4007a8 <tty_printf>
   40144c:	00000000 	nop
-  401450:	8fc20024 	lw	v0,36(s8)
-  401454:	00402825 	move	a1,v0
-  401458:	3c020100 	lui	v0,0x100
-  40145c:	24440138 	addiu	a0,v0,312
-  401460:	0c1001ea 	jal	4007a8 <tty_printf>
-  401464:	00000000 	nop
-  401468:	3c020100 	lui	v0,0x100
-  40146c:	24440078 	addiu	a0,v0,120
-  401470:	0c1001ea 	jal	4007a8 <tty_printf>
+  401450:	3c020100 	lui	v0,0x100
+  401454:	24440144 	addiu	a0,v0,324
+  401458:	0c1001ea 	jal	4007a8 <tty_printf>
+  40145c:	00000000 	nop
+  401460:	27c20020 	addiu	v0,s8,32
+  401464:	00402025 	move	a0,v0
+  401468:	0c1000b4 	jal	4002d0 <tty_getc>
+  40146c:	00000000 	nop
+  401470:	1000ffa3 	b	401300 <main+0x18>
   401474:	00000000 	nop
-  401478:	27c20020 	addiu	v0,s8,32
-  40147c:	00402025 	move	a0,v0
-  401480:	0c1000b4 	jal	4002d0 <tty_getc>
-  401484:	00000000 	nop
-  401488:	1000ff9d 	b	401300 <main+0x18>
-  40148c:	00000000 	nop
 
 Disassembly of section .MIPS.abiflags:
 
-00401490 <.MIPS.abiflags>:
-  401490:	01200000 	0x1200000
-  401494:	01000101 	0x1000101
+00401478 <.MIPS.abiflags>:
+  401478:	01200000 	0x1200000
+  40147c:	01000101 	0x1000101
 	...
-  4014a0:	00000001 	movf	zero,zero,$fcc0
-  4014a4:	00000000 	nop
+  401488:	00000001 	movf	zero,zero,$fcc0
+  40148c:	00000000 	nop
 
 Disassembly of section seg_data:
 
@@ -1484,7 +1478,8 @@ Disassembly of section seg_data:
  1000134:	0000000a 	movz	zero,zero,zero
  1000138:	3a736572 	xori	s3,s3,0x6572
  100013c:	0a642520 	j	9909480 <seg_stack_base+0x7909480>
- 1000140:	Address 0x0000000001000140 is out of bounds.
+ 1000140:	00000000 	nop
+ 1000144:	Address 0x0000000001000144 is out of bounds.
 
 
 Disassembly of section .reginfo:

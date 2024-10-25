@@ -32,12 +32,7 @@ __attribute__((constructor)) void main()
             tty_printf("GCD Error\n");
         };
         // Verify if GCD coprocessor is ready
-        gcd_get_status(&status);
-        while (status)
-        {
-            tty_printf("Calculating\n");
-            gcd_get_status(&status);
-        };
+        while (gcd_get_status(&status)){};
 
         // Get result and print number of cycles taken
         gcd_get_result(&res);
