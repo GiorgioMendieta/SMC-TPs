@@ -17,7 +17,7 @@ __attribute__((constructor)) void main()
         }
         if(byte == 'd'){
             tty_puts("Désactivation des interruptions timer\n");
-            timer_set_mode(0x0);
+            timer_set_mode(0x1);
         }
         if(byte == 'q'){
             tty_puts("Sortie du programme, ciao ciao\n");
