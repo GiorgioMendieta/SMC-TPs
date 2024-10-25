@@ -1,0 +1,160 @@
+
+reset.o:     file format elf32-littlemips
+
+
+Disassembly of section .reginfo:
+
+00000000 <.reginfo>:
+   0:	3c000000 	lui	zero,0x0
+	...
+
+Disassembly of section .MIPS.abiflags:
+
+00000000 <.MIPS.abiflags>:
+   0:	01200000 	0x1200000
+   4:	01000101 	0x1000101
+	...
+  10:	00000001 	movf	zero,zero,$fcc0
+  14:	00000000 	nop
+
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+	...
+
+Disassembly of section .reset:
+
+00000000 <reset>:
+   0:	401b7801 	mfc0	k1,$15,1
+   4:	337b0003 	andi	k1,k1,0x3
+   8:	241a0000 	li	k0,0
+   c:	137a0006 	beq	k1,k0,28 <proc0>
+  10:	241a0001 	li	k0,1
+  14:	137a0021 	beq	k1,k0,9c <proc1>
+  18:	241a0002 	li	k0,2
+  1c:	137a0039 	beq	k1,k0,104 <proc2>
+  20:	241a0003 	li	k0,3
+  24:	137a0051 	beq	k1,k0,16c <proc3>
+
+00000028 <proc0>:
+  28:	3c1b0000 	lui	k1,0x0
+  2c:	277b0000 	addiu	k1,k1,0
+  30:	3c1a0001 	lui	k0,0x1
+  34:	035be821 	addu	sp,k0,k1
+  38:	3c1a0000 	lui	k0,0x0
+  3c:	275a0000 	addiu	k0,k0,0
+  40:	241b1111 	li	k1,4369
+  44:	af5b0008 	sw	k1,8(k0)
+  48:	3c1a0000 	lui	k0,0x0
+  4c:	275a0000 	addiu	k0,k0,0
+  50:	3c1b0000 	lui	k1,0x0
+  54:	277b0000 	addiu	k1,k1,0
+  58:	af5b0000 	sw	k1,0(k0)
+  5c:	3c1b0000 	lui	k1,0x0
+  60:	277b0000 	addiu	k1,k1,0
+  64:	af5b0030 	sw	k1,48(k0)
+  68:	3c1b0000 	lui	k1,0x0
+  6c:	277b0000 	addiu	k1,k1,0
+  70:	af5b0020 	sw	k1,32(k0)
+  74:	3c1b0000 	lui	k1,0x0
+  78:	277b0000 	addiu	k1,k1,0
+  7c:	af5b0010 	sw	k1,16(k0)
+  80:	341aff13 	li	k0,0xff13
+  84:	409a6000 	mtc0	k0,c0_status
+  88:	3c1a0000 	lui	k0,0x0
+  8c:	275a0000 	addiu	k0,k0,0
+  90:	8f5a0000 	lw	k0,0(k0)
+  94:	409a7000 	mtc0	k0,c0_epc
+  98:	42000018 	eret
+
+0000009c <proc1>:
+  9c:	3c1b0000 	lui	k1,0x0
+  a0:	277b0000 	addiu	k1,k1,0
+  a4:	3c1a0002 	lui	k0,0x2
+  a8:	035be821 	addu	sp,k0,k1
+  ac:	3c1a0000 	lui	k0,0x0
+  b0:	275a0000 	addiu	k0,k0,0
+  b4:	241b2220 	li	k1,8736
+  b8:	af5b0028 	sw	k1,40(k0)
+  bc:	3c1a0000 	lui	k0,0x0
+  c0:	275a0000 	addiu	k0,k0,0
+  c4:	3c1b0000 	lui	k1,0x0
+  c8:	277b0000 	addiu	k1,k1,0
+  cc:	af5b0034 	sw	k1,52(k0)
+  d0:	3c1b0000 	lui	k1,0x0
+  d4:	277b0000 	addiu	k1,k1,0
+  d8:	af5b0024 	sw	k1,36(k0)
+  dc:	3c1b0000 	lui	k1,0x0
+  e0:	277b0000 	addiu	k1,k1,0
+  e4:	af5b0014 	sw	k1,20(k0)
+  e8:	341aff13 	li	k0,0xff13
+  ec:	409a6000 	mtc0	k0,c0_status
+  f0:	3c1a0000 	lui	k0,0x0
+  f4:	275a0000 	addiu	k0,k0,0
+  f8:	8f5a0004 	lw	k0,4(k0)
+  fc:	409a7000 	mtc0	k0,c0_epc
+ 100:	42000018 	eret
+
+00000104 <proc2>:
+ 104:	3c1b0000 	lui	k1,0x0
+ 108:	277b0000 	addiu	k1,k1,0
+ 10c:	3c1a0003 	lui	k0,0x3
+ 110:	035be821 	addu	sp,k0,k1
+ 114:	3c1a0000 	lui	k0,0x0
+ 118:	275a0000 	addiu	k0,k0,0
+ 11c:	241b4440 	li	k1,17472
+ 120:	af5b0048 	sw	k1,72(k0)
+ 124:	3c1a0000 	lui	k0,0x0
+ 128:	275a0000 	addiu	k0,k0,0
+ 12c:	3c1b0000 	lui	k1,0x0
+ 130:	277b0000 	addiu	k1,k1,0
+ 134:	af5b0038 	sw	k1,56(k0)
+ 138:	3c1b0000 	lui	k1,0x0
+ 13c:	277b0000 	addiu	k1,k1,0
+ 140:	af5b0028 	sw	k1,40(k0)
+ 144:	3c1b0000 	lui	k1,0x0
+ 148:	277b0000 	addiu	k1,k1,0
+ 14c:	af5b0018 	sw	k1,24(k0)
+ 150:	341aff13 	li	k0,0xff13
+ 154:	409a6000 	mtc0	k0,c0_status
+ 158:	3c1a0000 	lui	k0,0x0
+ 15c:	275a0000 	addiu	k0,k0,0
+ 160:	8f5a0008 	lw	k0,8(k0)
+ 164:	409a7000 	mtc0	k0,c0_epc
+ 168:	42000018 	eret
+
+0000016c <proc3>:
+ 16c:	3c1b0000 	lui	k1,0x0
+ 170:	277b0000 	addiu	k1,k1,0
+ 174:	3c1a0004 	lui	k0,0x4
+ 178:	035be821 	addu	sp,k0,k1
+ 17c:	3c1a0000 	lui	k0,0x0
+ 180:	275a0000 	addiu	k0,k0,0
+ 184:	341b8880 	li	k1,0x8880
+ 188:	af5b0068 	sw	k1,104(k0)
+ 18c:	3c1a0000 	lui	k0,0x0
+ 190:	275a0000 	addiu	k0,k0,0
+ 194:	3c1b0000 	lui	k1,0x0
+ 198:	277b0000 	addiu	k1,k1,0
+ 19c:	af5b003c 	sw	k1,60(k0)
+ 1a0:	3c1b0000 	lui	k1,0x0
+ 1a4:	277b0000 	addiu	k1,k1,0
+ 1a8:	af5b002e 	sw	k1,46(k0)
+ 1ac:	3c1b0000 	lui	k1,0x0
+ 1b0:	277b0000 	addiu	k1,k1,0
+ 1b4:	af5b001c 	sw	k1,28(k0)
+ 1b8:	341aff13 	li	k0,0xff13
+ 1bc:	409a6000 	mtc0	k0,c0_status
+ 1c0:	3c1a0000 	lui	k0,0x0
+ 1c4:	275a0000 	addiu	k0,k0,0
+ 1c8:	8f5a000c 	lw	k0,12(k0)
+ 1cc:	409a7000 	mtc0	k0,c0_epc
+ 1d0:	42000018 	eret
+
+Disassembly of section .gnu.attributes:
+
+00000000 <.gnu.attributes>:
+   0:	00000f41 	0xf41
+   4:	756e6700 	jalx	5b99c00 <proc3+0x5b99a94>
+   8:	00070100 	sll	zero,a3,0x4
+   c:	01040000 	0x1040000
