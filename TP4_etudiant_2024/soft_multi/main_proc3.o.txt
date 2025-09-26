@@ -1,0 +1,91 @@
+
+main_proc3.o:     file format elf32-littlemips
+
+
+Disassembly of section .text:
+
+00000000 <main_proc3>:
+   0:	27bdffe0 	addiu	sp,sp,-32
+   4:	afbf001c 	sw	ra,28(sp)
+   8:	afbe0018 	sw	s8,24(sp)
+   c:	03a0f025 	move	s8,sp
+  10:	3c020000 	lui	v0,0x0
+  14:	24440000 	addiu	a0,v0,0
+  18:	0c000000 	jal	0 <main_proc3>
+  1c:	00000000 	nop
+  20:	27c20010 	addiu	v0,s8,16
+  24:	00402025 	move	a0,v0
+  28:	0c000000 	jal	0 <main_proc3>
+  2c:	00000000 	nop
+  30:	3c020000 	lui	v0,0x0
+  34:	24440020 	addiu	a0,v0,32
+  38:	0c000000 	jal	0 <main_proc3>
+  3c:	00000000 	nop
+  40:	1000fff7 	b	20 <main_proc3+0x20>
+  44:	00000000 	nop
+
+Disassembly of section .reginfo:
+
+00000000 <.reginfo>:
+   0:	e0000014 	sc	zero,20(zero)
+	...
+
+Disassembly of section .MIPS.abiflags:
+
+00000000 <.MIPS.abiflags>:
+   0:	01200000 	0x1200000
+   4:	01000101 	0x1000101
+	...
+  10:	00000001 	movf	zero,zero,$fcc0
+  14:	00000000 	nop
+
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+   0:	00000000 	nop
+   4:	c0000000 	ll	zero,0(zero)
+   8:	fffffffc 	sdc3	$31,-4(ra)
+	...
+  14:	00000020 	add	zero,zero,zero
+  18:	0000001e 	0x1e
+  1c:	0000001f 	0x1f
+
+Disassembly of section .rodata:
+
+00000000 <.rodata>:
+   0:	6e656942 	0x6e656942
+   4:	756e6576 	jalx	5b995d8 <main_proc3+0x5b995d8>
+   8:	61642065 	0x61642065
+   c:	6c20736e 	0x6c20736e
+  10:	616d2065 	0x616d2065
+  14:	705f6e69 	0x705f6e69
+  18:	33636f72 	andi	v1,k1,0x6f72
+  1c:	0000000a 	movz	zero,zero,zero
+  20:	7320654a 	0x7320654a
+  24:	20736975 	addi	s3,v1,26997
+  28:	65726853 	0x65726853
+  2c:	Address 0x000000000000002c is out of bounds.
+
+
+Disassembly of section .ctors:
+
+00000000 <.ctors>:
+   0:	00000000 	nop
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	43434700 	c0	0x1434700
+   4:	4728203a 	c1	0x128203a
+   8:	2029554e 	addi	t1,at,21838
+   c:	2e322e38 	sltiu	s2,s1,11832
+  10:	Address 0x0000000000000010 is out of bounds.
+
+
+Disassembly of section .gnu.attributes:
+
+00000000 <.gnu.attributes>:
+   0:	00000f41 	0xf41
+   4:	756e6700 	jalx	5b99c00 <main_proc3+0x5b99c00>
+   8:	00070100 	sll	zero,a3,0x4
+   c:	01040000 	0x1040000

@@ -1,0 +1,57 @@
+LD= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-ld
+CC= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-gcc
+AS= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-as
+DU= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-objdump
+
+SYS_OBJS=  reset.o \
+	   giet.o \
+	   drivers.o \
+	   common.o \
+           ctx_handler.o \
+           sys_handler.o \
+           irq_handler.o \
+           exc_handler.o 
+
+APP_OBJS=  stdio.o \
+	   main.o 
+
+GIET_SYS_PATH= /users/enseig/alain/giet_2011/sys
+GIET_APP_PATH= /users/enseig/alain/giet_2011/app
+
+CFLAGS= -Wall -mno-gpopt -ffreestanding -mips32 
+ASFLAGS= -g -mips32
+INCLUDES= -I$(GIET_SYS_PATH) -I.
+DUFLAGS= -D
+
+all: sys.bin app.bin
+
+## system compilation
+
+sys.bin: $(SYS_OBJS) sys.ld seg.ld
+	$(LD) -o $@ -T sys.ld $(SYS_OBJS)
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+%.o: %.s
+	$(AS) $(ASFLAGS) -o $@ $<
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+%.o: $(GIET_SYS_PATH)/%.c $(GIET_SYS_PATH)/%.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+## application compilation  
+
+app.bin: $(APP_OBJS) app.ld seg.ld
+	$(LD) -o $@ -T app.ld $(APP_OBJS)
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+stdio.o: $(GIET_APP_PATH)/stdio.c $(GIET_APP_PATH)/stdio.h
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+main.o: main.c
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) $(DUFLAGS) $@ > $@.txt
+
+clean:
+	rm -f *.o *.bin *.txt core *~

@@ -1,0 +1,155 @@
+
+main_display.o:     file format elf32-littlemips
+
+
+Disassembly of section .text:
+
+00000000 <main_display>:
+   0:	27bdbfd8 	addiu	sp,sp,-16424
+   4:	afbf4024 	sw	ra,16420(sp)
+   8:	afbe4020 	sw	s8,16416(sp)
+   c:	03a0f025 	move	s8,sp
+  10:	afc00010 	sw	zero,16(s8)
+  14:	afc00014 	sw	zero,20(s8)
+  18:	3c020000 	lui	v0,0x0
+  1c:	24440000 	addiu	a0,v0,0
+  20:	0c000000 	jal	0 <main_display>
+  24:	00000000 	nop
+  28:	27c24018 	addiu	v0,s8,16408
+  2c:	00402025 	move	a0,v0
+  30:	0c000000 	jal	0 <main_display>
+  34:	00000000 	nop
+  38:	8fc30014 	lw	v1,20(s8)
+  3c:	24020015 	li	v0,21
+  40:	14620003 	bne	v1,v0,50 <main_display+0x50>
+  44:	00000000 	nop
+  48:	afc00010 	sw	zero,16(s8)
+  4c:	afc00014 	sw	zero,20(s8)
+  50:	83c24018 	lb	v0,16408(s8)
+  54:	1840fff4 	blez	v0,28 <main_display+0x28>
+  58:	00000000 	nop
+  5c:	8fc20010 	lw	v0,16(s8)
+  60:	27c30018 	addiu	v1,s8,24
+  64:	24060020 	li	a2,32
+  68:	00602825 	move	a1,v1
+  6c:	00402025 	move	a0,v0
+  70:	0c000000 	jal	0 <main_display>
+  74:	00000000 	nop
+  78:	10400005 	beqz	v0,90 <main_display+0x90>
+  7c:	00000000 	nop
+  80:	3c020000 	lui	v0,0x0
+  84:	24440020 	addiu	a0,v0,32
+  88:	0c000000 	jal	0 <main_display>
+  8c:	00000000 	nop
+  90:	0c000000 	jal	0 <main_display>
+  94:	00000000 	nop
+  98:	10400005 	beqz	v0,b0 <main_display+0xb0>
+  9c:	00000000 	nop
+  a0:	3c020000 	lui	v0,0x0
+  a4:	24440038 	addiu	a0,v0,56
+  a8:	0c000000 	jal	0 <main_display>
+  ac:	00000000 	nop
+  b0:	27c20018 	addiu	v0,s8,24
+  b4:	24064000 	li	a2,16384
+  b8:	00402825 	move	a1,v0
+  bc:	00002025 	move	a0,zero
+  c0:	0c000000 	jal	0 <main_display>
+  c4:	00000000 	nop
+  c8:	10400005 	beqz	v0,e0 <main_display+0xe0>
+  cc:	00000000 	nop
+  d0:	3c020000 	lui	v0,0x0
+  d4:	24440054 	addiu	a0,v0,84
+  d8:	0c000000 	jal	0 <main_display>
+  dc:	00000000 	nop
+  e0:	8fc20010 	lw	v0,16(s8)
+  e4:	24420020 	addiu	v0,v0,32
+  e8:	afc20010 	sw	v0,16(s8)
+  ec:	8fc20014 	lw	v0,20(s8)
+  f0:	24420001 	addiu	v0,v0,1
+  f4:	afc20014 	sw	v0,20(s8)
+  f8:	1000ffcb 	b	28 <main_display+0x28>
+  fc:	00000000 	nop
+
+Disassembly of section .reginfo:
+
+00000000 <.reginfo>:
+   0:	e000007c 	sc	zero,124(zero)
+	...
+
+Disassembly of section .MIPS.abiflags:
+
+00000000 <.MIPS.abiflags>:
+   0:	01200000 	0x1200000
+   4:	01000101 	0x1000101
+	...
+  10:	00000001 	movf	zero,zero,$fcc0
+  14:	00000000 	nop
+
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+   0:	00000000 	nop
+   4:	c0000000 	ll	zero,0(zero)
+   8:	fffffffc 	sdc3	$31,-4(ra)
+	...
+  14:	00004028 	0x4028
+  18:	0000001e 	0x1e
+  1c:	0000001f 	0x1f
+
+Disassembly of section .rodata:
+
+00000000 <.rodata>:
+   0:	6e656942 	0x6e656942
+   4:	756e6576 	jalx	5b995d8 <main_display+0x5b995d8>
+   8:	61642065 	0x61642065
+   c:	6c20736e 	0x6c20736e
+  10:	616d2065 	0x616d2065
+  14:	64206e69 	0x64206e69
+  18:	6c707369 	0x6c707369
+  1c:	000a7961 	0xa7961
+  20:	6f727245 	0x6f727245
+  24:	75642072 	jalx	59081c8 <main_display+0x59081c8>
+  28:	676e6972 	0x676e6972
+  2c:	636f6920 	0x636f6920
+  30:	61657220 	0x61657220
+  34:	00000a64 	0xa64
+  38:	6f727245 	0x6f727245
+  3c:	75642072 	jalx	59081c8 <main_display+0x59081c8>
+  40:	676e6972 	0x676e6972
+  44:	636f6920 	0x636f6920
+  48:	61727420 	0x61727420
+  4c:	6566736e 	0x6566736e
+  50:	000a7472 	tlt	zero,t2,0x1d1
+  54:	6f727245 	0x6f727245
+  58:	72756420 	0x72756420
+  5c:	20676e69 	addi	a3,v1,28265
+  60:	20656874 	addi	a1,v1,26740
+  64:	70736964 	0x70736964
+  68:	2079616c 	addi	t9,v1,24940
+  6c:	7420666f 	jalx	8199bc <main_display+0x8199bc>
+  70:	70206568 	0x70206568
+  74:	75746369 	jalx	5d18da4 <main_display+0x5d18da4>
+  78:	000a6572 	tlt	zero,t2,0x195
+
+Disassembly of section .ctors:
+
+00000000 <.ctors>:
+   0:	00000000 	nop
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	43434700 	c0	0x1434700
+   4:	4728203a 	c1	0x128203a
+   8:	2029554e 	addi	t1,at,21838
+   c:	2e322e38 	sltiu	s2,s1,11832
+  10:	Address 0x0000000000000010 is out of bounds.
+
+
+Disassembly of section .gnu.attributes:
+
+00000000 <.gnu.attributes>:
+   0:	00000f41 	0xf41
+   4:	756e6700 	jalx	5b99c00 <main_display+0x5b99c00>
+   8:	00070100 	sll	zero,a3,0x4
+   c:	01040000 	0x1040000
