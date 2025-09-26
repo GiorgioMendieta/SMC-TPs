@@ -29,7 +29,7 @@
 // to drive the "Larger Common Divider" coprocessor.
 // It uses two FIFO interfaces, executing and infinite loop:
 // It writes sucessively two (uint32_t) operands to the
-// output fifo port, reads the resUsers/giorgio/.dotfiles/.clang-formatult on the input fifo
+// output fifo port, reads the result on the input fifo
 // interface (uint32_t), and finally displays the results.
 //
 // Remark : this component emulates two complex functionnalities
