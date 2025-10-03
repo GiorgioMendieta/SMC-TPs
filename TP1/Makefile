@@ -1,9 +1,7 @@
 CC=g++
 CFLAGS=-Wno-deprecated -fpermissive
-# CTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/cctools/include -m32 -c
-# FASTTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/systemcass/include -m32 -c
-CTOOLS=-std=gnu++0x -I. -I ../tools/cctools -m32 -c
-FASTTOOLS=-std=gnu++0x -I. -I ../tools/systemcass -m32 -c
+CTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/cctools/include -m32 -c
+FASTTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/systemcass/include -m32 -c
 
 all: simulator.x fast_simulator.x
 	
