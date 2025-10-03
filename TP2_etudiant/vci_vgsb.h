@@ -131,9 +131,7 @@ public:
 	void genMealy_cmdval();
 	void genMealy_cmdack();
 
-	
 }; // end class VciVgsb
-
 
 }} // end namespace
 

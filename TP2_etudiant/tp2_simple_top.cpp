@@ -7,8 +7,8 @@
 #include "vci_param.h"
 #include "mapping_table.h"
 
-#define GCD_BASE	0x50000
-#define GCD_SIZE	1 << 4
+#define GCD_BASE	TO BE COMPLETED...
+#define GCD_SIZE	TO BE COMPLETED...
 	
 int sc_main(int argc, char *argv[])
 {
@@ -28,7 +28,7 @@ int sc_main(int argc, char *argv[])
 	// 	pktid_size	= 1;
 	// 	wrplen_size	= 1;
 
-	typedef VciParams<4,4,32,1,1,1,12,1,1,1> vci_param;
+	typedef VciParams< TO BE COMPLETED > vci_param;
 
 	///////////////////////////////////////////////////////////////////////////
 	// simulation arguments : number of cycles & seed for the random generation
@@ -55,8 +55,8 @@ int sc_main(int argc, char *argv[])
 	//////////////////////////////////////////////////////////////////////////
 	// Components
 	//////////////////////////////////////////////////////////////////////////
-    VciGcdMaster<vci_param> 	master("gcd_master", IntTab(0), maptab, seed, GCD_BASE);
-	VciGcdCoprocessor<vci_param>	coproc("gcd_coprocessor", IntTab(0), maptab);
+        VciGcdMaster<vci_param> 	master(TO BE COMPLETED);
+	VciGcdCoprocessor<vci_param>	coproc(TO BE COMPLETED);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Net-List
@@ -73,7 +73,7 @@ int sc_main(int argc, char *argv[])
 	// simulation
 	//////////////////////////////////////////////////////////////////////////
         signal_resetn = false;
-        sc_start( sc_time( 1, SC_NS ) );
+        sc_start( sc_time( 1, SC_NS ) ) ;
 
         signal_resetn = true;
         for ( size_t n=1 ; n<ncycles ; n++) sc_start( sc_time( 1, SC_NS ) ) ;

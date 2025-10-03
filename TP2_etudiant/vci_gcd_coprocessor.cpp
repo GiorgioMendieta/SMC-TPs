@@ -57,11 +57,11 @@ VciGcdCoprocessor<vci_param>::VciGcdCoprocessor(sc_module_name insname,
 {
 	SC_METHOD(transition);
 	dont_initialize();
-	sensitive << p_clk.pos();
+	sensitive << A COMPLETER
 	
 	SC_METHOD(genMoore);
 	dont_initialize();
-	sensitive << p_clk.neg();
+	sensitive << A COMPLETER
 }
 
 ////////////////////////////
@@ -75,8 +75,8 @@ template<typename vci_param>
 void VciGcdCoprocessor<vci_param>::transition()
 {
 	if ( !p_resetn.read() ) {
-		r_vci_fsm = VCI_GET_CMD;
-		r_exe_fsm = EXE_IDLE; // c'est vÃ©rifiÃ©
+		r_vci_fsm = A COMPLETER 
+		r_exe_fsm = A COMPLETER 
 		return;
 	}
 
@@ -89,20 +89,20 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 	/////////////////////////////
 	switch ( r_exe_fsm.read() ) {
 	case EXE_IDLE:
-		if( r_vci_fsm.read() == VCI_RSP_START ) r_exe_fsm = EXE_COMPARE; 
+		if( r_vci_fsm.read() == VCI_RSP_START ) r_exe_fsm = A COMPLETER 
 		break;
 	case EXE_COMPARE:
-		if      ( r_opa.read() < r_opb.read() )	r_exe_fsm = EXE_DECB;
-		else if ( r_opb.read() < r_opa.read() )	r_exe_fsm = EXE_DECA;
-		else					r_exe_fsm = EXE_IDLE;
+		if      ( r_opa.read() < r_opb.read() )	r_exe_fsm = A COMPLETER
+		else if ( r_opb.read() < r_opa.read() )	r_exe_fsm = A COMPLETER
+		else					r_exe_fsm = A COMPLETER
 		break;
 	case EXE_DECA:
-		r_opa     = r_opa.read() - r_opb.read();
-		r_exe_fsm = EXE_COMPARE;
+		r_opa     = A COMPLETER
+		r_exe_fsm = A COMPLETER
 		break;
 	case EXE_DECB:
-		r_opb     = r_opb.read() - r_opa.read();
-		r_exe_fsm = EXE_COMPARE;
+		r_opb     = A COMPLETER
+		r_exe_fsm = A COMPLETER
 		break;
 	} // end switch exe-fsm
 
@@ -113,32 +113,30 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 			typename vci_param::addr_t address = p_vci.address.read();
 			uint32_t cell  = ( address - m_segment.baseAddress() ) / vci_param::B;
 			// only accepts single word requests & checks for segmentation violations
-			assert   ( (p_vci.eop.read()) );
-			assert 	 ( p_vci.plen.read() == 4 );
-			assert	 ( p_vci.cmd.read() != vci_param::CMD_LOCKED_READ );
-			assert	 ( p_vci.cmd.read() != vci_param::CMD_STORE_COND );
-			assert 	 ( m_segment.contains(address) );
-			
-			
-
+			assert ( ( p_vci.eop.read() ) && 
+			 	 ( p_vci.plen.read() == 4 ) &&
+				 ( p_vci.cmd.read() != vci_param::CMD_LOCKED_READ ) &&
+				 ( p_vci.cmd.read() != vci_param::CMD_STORE_COND ) &&
+			 	 ( m_segment.contains(address) ) &&
+                         	   "illegal command received by the GCD coprocessor");
 			// store the VCI command in registers
-			r_srcid	= p_vci.srcid.read();
-			r_trdid	= p_vci.trdid.read();
-			r_pktid	= p_vci.pktid.read();
+			r_srcid	= A COMPLETER
+			r_trdid	= A COMPLETER
+			r_pktid	= A COMPLETER
 			// test the command
 			if ( ( p_vci.cmd.read() == vci_param::CMD_READ ) && ( cell == GCD_OPA ) ) { 
-				r_vci_fsm = VCI_RSP_RESULT;
+				r_vci_fsm = A COMPLETER
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_READ ) && ( cell == GCD_STATUS ) ) {
-				r_vci_fsm = VCI_RSP_STATUS;
+				r_vci_fsm = A COMPLETER
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_OPA ) ) {
-				r_opa     = p_vci.wdata.read();
-				r_vci_fsm = VCI_RSP_OPA;
+				r_opa     = A COMPLETER
+				r_vci_fsm = A COMPLETER
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_OPB ) ) {
-				r_opb     = p_vci.wdata.read();
-				r_vci_fsm = VCI_RSP_OPB;
+				r_opb     = A COMPLETER
+				r_vci_fsm = A COMPLETER
 			} else if ( ( p_vci.cmd.read() == vci_param::CMD_WRITE ) && ( cell == GCD_START ) ) {
-				r_vci_fsm = VCI_RSP_START;
-			} else {
+				r_vci_fsm = A COMPLETER
+			} else {	
 				std::cout << "illegal command to the GCD coprocessor" << std::endl;
 				exit(0);
 			}
@@ -149,7 +147,7 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 	case VCI_RSP_START:
 	case VCI_RSP_STATUS:
 	case VCI_RSP_RESULT:
-		if ( p_vci.rspack.read() ) 	r_vci_fsm = VCI_GET_CMD;
+		if ( p_vci.rspack.read() ) 	r_vci_fsm = A COMPLETER
 		break;
 	} // end switch vci_fsm
 } // end transition()
@@ -158,39 +156,39 @@ std::cout << name() << "  opb_reg = " << r_opb.read() << std::endl;
 template<typename vci_param> 
 void VciGcdCoprocessor<vci_param>::genMoore()
 {
-	// sorties indï¿½pendantes de l'ï¿½tat de l'automate
-	p_vci.rsrcid = r_srcid;
-	p_vci.rtrdid = r_trdid;
-	p_vci.rpktid = r_pktid;
-	p_vci.rerror = false;
-	p_vci.reop   = true;
+	// sorties indépendantes de l'état de l'automate
+	p_vci.rsrcid = A COMPLETER
+	p_vci.rtrdid = A COMPLETER
+	p_vci.rpktid = A COMPLETER
+	p_vci.rerror = A COMPLETER
+	p_vci.reop   = A COMPLETER
 
 	switch (r_vci_fsm) {
 	case VCI_GET_CMD:
-		p_vci.cmdack = true;
-		p_vci.rspval = false;
-		p_vci.rdata  = 0;
+		p_vci.cmdack = A COMPLETER
+		p_vci.rspval = A COMPLETER
+		p_vci.rdata  = A COMPLETER
 		break;
 	case VCI_RSP_OPA:
 	case VCI_RSP_OPB:
 	case VCI_RSP_START:
-		p_vci.cmdack = false;
-		p_vci.rspval = true;
-		p_vci.rdata  = 0;
+		p_vci.cmdack = A COMPLETER
+		p_vci.rspval = A COMPLETER
+		p_vci.rdata  = A COMPLETER
 		break;
 	case VCI_RSP_STATUS:
-		p_vci.cmdack = false;
-		p_vci.rspval = true;
-		p_vci.rdata  = (r_exe_fsm.read() != EXE_IDLE);
+		p_vci.cmdack = A COMPLETER
+		p_vci.rspval = A COMPLETER
+		p_vci.rdata  = A COMPLETER
 		break;
 	case VCI_RSP_RESULT:
-		p_vci.cmdack = false;
-		p_vci.rspval = (r_exe_fsm.read() == EXE_IDLE);
-		p_vci.rdata  = r_opa.read();
+		p_vci.cmdack = A COMPLETER
+		p_vci.rspval = A COMPLETER
+		p_vci.rdata  = A COMPLETER
 	}
 } // end genMoore()
 
-template class VciGcdCoprocessor<soclib::caba::VciParams<4,4,32,1,1,1,12,1,1,1>>;
+template class VciGcdCoprocessor<soclib::caba::VciParams<A COMPLETER> >;
 
 }}
 
