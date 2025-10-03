@@ -37,7 +37,7 @@ namespace soclib
 
         tmpl(void)::init(int use_bits, int drop_bits)
         {
-            m_table     = new output_t[1 << use_bits];
+            m_table     = new output_t[1 << uset_bits];
             m_use_bits  = use_bits;
             m_drop_bits = drop_bits;
             m_low_mask  = (1 << use_bits) - 1;
