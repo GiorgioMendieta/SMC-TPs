@@ -1,12 +1,12 @@
-#include <systemc>
 #include <limits>
+#include <systemc>
 
-#include "fifo_gcd_master.h"
 #include "fifo_gcd_coprocessor.h"
+#include "fifo_gcd_master.h"
 #include "fifo_ports.h"
 #include "fifo_signals.h"
 
-int sc_main(int argc, char *argv[])
+int sc_main(int argc, char* argv[])
 {
     using namespace sc_core;
     using namespace soclib::caba;
@@ -15,7 +15,7 @@ int sc_main(int argc, char *argv[])
     // Arguments : number of cycles & seed for the random generation
     /////////////////////////////////////////////////////////////////
     int ncycles = std::numeric_limits<int>::max();
-    int seed = 123456789;
+    int seed    = 123456789;
     if (argc > 1)
         ncycles = atoi(argv[1]);
     if (argc > 2)

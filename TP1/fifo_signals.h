@@ -35,24 +35,22 @@ namespace soclib
     namespace caba
     {
 
-        template <typename word_t>
-        class FifoSignals
+        template <typename word_t> class FifoSignals
         {
-        public:
+          public:
             sc_core::sc_signal<word_t> data;
             sc_core::sc_signal<bool> r_wok;
             sc_core::sc_signal<bool> w_rok;
 
 #define __ren(x) x((insname + "_" #x).c_str())
-            FifoSignals(std::string insname = sc_core::sc_gen_unique_name("fifo_signals"))
-                : __ren(data),
-                  __ren(r_wok),
-                  __ren(w_rok)
-            {
-            }
+
+            FifoSignals(std::string insname = sc_core::sc_gen_unique_name("fifo_signals")) :
+                __ren(data), __ren(r_wok), __ren(w_rok)
+            {}
+
 #undef __ren
 
-            void trace(sc_core::sc_trace_file *tf, const std::string &name)
+            void trace(sc_core::sc_trace_file* tf, const std::string& name)
             {
 #define __trace(x) sc_core::sc_trace(tf, x, name + "_" + #x)
                 __trace(data);
@@ -62,7 +60,7 @@ namespace soclib
             }
         };
 
-    }
-}
+    } // namespace caba
+} // namespace soclib
 
 #endif /* SOCLIB_CABA_FIFO_SIGNALS_H */

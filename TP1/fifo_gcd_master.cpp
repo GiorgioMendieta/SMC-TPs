@@ -38,16 +38,9 @@ namespace soclib
     {
 
         //////////////////////////////////////////////////////
-        FifoGcdMaster::FifoGcdMaster(sc_module_name insname, int seed)
-            : sc_module(insname),
-              r_fsm("r_fsm"),
-              r_opa("r_opa"),
-              r_opb("r_opb"),
-              r_res("r_res"),
-              p_resetn("p_resetn"),
-              p_clk("p_clk"),
-              p_in("p_in"),
-              p_out("p_out")
+        FifoGcdMaster::FifoGcdMaster(sc_module_name insname, int seed) :
+            sc_module(insname), r_fsm("r_fsm"), r_opa("r_opa"), r_opb("r_opb"), r_res("r_res"), p_resetn("p_resetn"),
+            p_clk("p_clk"), p_in("p_in"), p_out("p_out")
         {
             SC_METHOD(transition);
             dont_initialize();
@@ -60,17 +53,15 @@ namespace soclib
             srand(seed);
         }
 
-        FifoGcdMaster::~FifoGcdMaster()
-        {
-        }
+        FifoGcdMaster::~FifoGcdMaster() {}
 
         ////////////////////////////////
         void FifoGcdMaster::transition()
         {
             if (!p_resetn.read())
             {
-                r_fsm = RANDOM;
-                r_cyclecount = 0;
+                r_fsm            = RANDOM;
+                r_cyclecount     = 0;
                 r_iterationcount = 0;
                 return;
             }
@@ -79,9 +70,9 @@ namespace soclib
             {
             case RANDOM:
                 r_iterationcount = r_iterationcount.read() + 1;
-                r_opa = rand();
-                r_opb = rand();
-                r_fsm = WRITE_OPA;
+                r_opa            = rand();
+                r_opb            = rand();
+                r_fsm            = WRITE_OPA;
                 break;
 
             case WRITE_OPA:
@@ -128,33 +119,33 @@ namespace soclib
             {
             case RANDOM:
             case DISPLAY:
-                p_in.r = false;
-                p_out.w = false;
+                p_in.r     = false;
+                p_out.w    = false;
                 p_out.data = 0;
                 break;
 
             case WRITE_OPA:
-                p_in.r = false;
-                p_out.w = true;
+                p_in.r     = false;
+                p_out.w    = true;
                 p_out.data = r_opa;
                 break;
 
             case WRITE_OPB:
-                p_in.r = false;
-                p_out.w = true;
+                p_in.r     = false;
+                p_out.w    = true;
                 p_out.data = r_opb;
                 break;
 
             case READ_RES:
-                p_in.r = true;
-                p_out.w = false;
+                p_in.r     = true;
+                p_out.w    = false;
                 p_out.data = 0;
                 break;
             } // end switch
         } // end genMoore()
 
-    }
-}
+    } // namespace caba
+} // namespace soclib
 
 // Local Variables:
 // tab-width: 4

@@ -28,8 +28,8 @@
 #ifndef SOCLIB_CABA_FIFO_PORTS_H
 #define SOCLIB_CABA_FIFO_PORTS_H
 
-#include <systemc>
 #include "fifo_signals.h"
+#include <systemc>
 
 namespace soclib
 {
@@ -38,30 +38,26 @@ namespace soclib
 
         using namespace sc_core;
 
-        template <typename word_t>
-        struct FifoInput
+        template <typename word_t> struct FifoInput
         {
             sc_in<word_t> data;
             sc_out<bool> r;
             sc_in<bool> rok;
 
 #define __ren(x) x((name + "_" #x).c_str())
-            FifoInput(const std::string &name = sc_gen_unique_name("fifo_input"))
-                : __ren(data),
-                  __ren(r),
-                  __ren(rok)
-            {
-            }
+
+            FifoInput(const std::string& name = sc_gen_unique_name("fifo_input")) : __ren(data), __ren(r), __ren(rok) {}
+
 #undef __ren
 
-            void operator()(FifoSignals<word_t> &sig)
+            void operator()(FifoSignals<word_t>& sig)
             {
                 data(sig.data);
                 r(sig.r_wok);
                 rok(sig.w_rok);
             }
 
-            void operator()(FifoInput<word_t> &port)
+            void operator()(FifoInput<word_t>& port)
             {
                 data(port.data);
                 r(port.r);
@@ -69,30 +65,27 @@ namespace soclib
             }
         };
 
-        template <typename word_t>
-        struct FifoOutput
+        template <typename word_t> struct FifoOutput
         {
             sc_out<word_t> data;
             sc_in<bool> wok;
             sc_out<bool> w;
 
 #define __ren(x) x((name + "_" #x).c_str())
-            FifoOutput(const std::string &name = sc_gen_unique_name("fifo_output"))
-                : __ren(data),
-                  __ren(wok),
-                  __ren(w)
-            {
-            }
+
+            FifoOutput(const std::string& name = sc_gen_unique_name("fifo_output")) : __ren(data), __ren(wok), __ren(w)
+            {}
+
 #undef __ren
 
-            void operator()(FifoSignals<word_t> &sig)
+            void operator()(FifoSignals<word_t>& sig)
             {
                 data(sig.data);
                 wok(sig.r_wok);
                 w(sig.w_rok);
             }
 
-            void operator()(FifoOutput<word_t> &port)
+            void operator()(FifoOutput<word_t>& port)
             {
                 data(port.data);
                 wok(port.wok);
@@ -100,7 +93,7 @@ namespace soclib
             }
         };
 
-    }
-}
+    } // namespace caba
+} // namespace soclib
 
 #endif /* SOCLIB_CABA_FIFO_PORTS_H */

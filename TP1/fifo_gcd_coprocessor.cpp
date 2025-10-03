@@ -38,15 +38,9 @@ namespace soclib
     {
 
         ////////////////////////////////////////////////////////////////
-        FifoGcdCoprocessor::FifoGcdCoprocessor(sc_module_name insname)
-            : sc_module(insname),
-              r_fsm("r_fsm"),
-              r_opa("r_opa"),
-              r_opb("r_opb"),
-              p_resetn("resetn"),
-              p_clk("clk"),
-              p_in("p_in"),
-              p_out("p_out")
+        FifoGcdCoprocessor::FifoGcdCoprocessor(sc_module_name insname) :
+            sc_module(insname), r_fsm("r_fsm"), r_opa("r_opa"), r_opb("r_opb"), p_resetn("resetn"), p_clk("clk"),
+            p_in("p_in"), p_out("p_out")
         {
             SC_METHOD(transition);
             dont_initialize();
@@ -115,29 +109,29 @@ namespace soclib
             {
             case READ_OPA:
             case READ_OPB:
-                p_in.r = true;
-                p_out.w = false;
+                p_in.r     = true;
+                p_out.w    = false;
                 p_out.data = 0;
                 break;
 
             case COMPARE:
             case DECR_A:
             case DECR_B:
-                p_in.r = false;
-                p_out.w = false;
+                p_in.r     = false;
+                p_out.w    = false;
                 p_out.data = 0;
                 break;
 
             case WRITE_RES:
-                p_in.r = false;
-                p_out.w = true;
+                p_in.r     = false;
+                p_out.w    = true;
                 p_out.data = r_opa;
                 break;
             } // end switch
         } // end genMoore()
 
-    }
-}
+    } // namespace caba
+} // namespace soclib
 
 // Local Variables:
 // tab-width: 4

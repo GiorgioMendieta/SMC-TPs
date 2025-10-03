@@ -43,8 +43,8 @@
 #ifndef FIFO_GCD_MASTER_H
 #define FIFO_GCD_MASTER_H
 
-#include <systemc>
 #include "fifo_ports.h"
+#include <systemc>
 
 namespace soclib
 {
@@ -52,8 +52,7 @@ namespace soclib
     {
 
         ///////////////////
-        class FifoGcdMaster
-            : public sc_core::sc_module
+        class FifoGcdMaster : public sc_core::sc_module
         {
             enum fsm_state_e
             {
@@ -72,10 +71,10 @@ namespace soclib
             sc_core::sc_signal<uint32_t> r_cyclecount;
             sc_core::sc_signal<uint32_t> r_iterationcount;
 
-        protected:
+          protected:
             SC_HAS_PROCESS(FifoGcdMaster);
 
-        public:
+          public:
             // ports
             sc_core::sc_in<bool> p_resetn;
             sc_core::sc_in<bool> p_clk;
@@ -86,15 +85,15 @@ namespace soclib
             FifoGcdMaster(sc_core::sc_module_name insname, int seed);
             ~FifoGcdMaster();
 
-        private:
+          private:
             // member functions
             void transition();
             void genMoore();
 
         }; // end class FifoGcdMaster
 
-    }
-}
+    } // namespace caba
+} // namespace soclib
 
 #endif
 
