@@ -1,23 +1,23 @@
 /* -*- c++ -*-
  *
  * SOCLIB_LGPL_HEADER_BEGIN
- * 
+ *
  * This file is part of SoCLib, GNU LGPLv2.1.
- * 
+ *
  * SoCLib is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; version 2.1 of the License.
- * 
+ *
  * SoCLib is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with SoCLib; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA
- * 
+ *
  * SOCLIB_LGPL_HEADER_END
  *
  * Copyright (c) UPMC, Lip6
@@ -41,49 +41,54 @@
 #include <systemc>
 #include "fifo_ports.h"
 
-namespace soclib {
-namespace caba {
-
-////////////////////////
-class FifoGcdCoprocessor
-	: public sc_core::sc_module
+namespace soclib
 {
-	enum coprocessor_fsm_state_e {
-		READ_OPA,
-		READ_OPB,
-		COMPARE,
-		DECR_A,
-		DECR_B,
-		WRITE_RES
-	};
+    namespace caba
+    {
 
-	// Registers
-		sc_core::sc_signal<int>				r_fsm;
-		sc_core::sc_signal<uint32_t>   		r_opa;
-        sc_core::sc_signal<uint32_t>   		r_opb;
+        ////////////////////////
+        class FifoGcdCoprocessor
+            : public sc_core::sc_module
+        {
+            enum coprocessor_fsm_state_e
+            {
+                READ_OPA,
+                READ_OPB,
+                COMPARE,
+                DECR_A,
+                DECR_B,
+                WRITE_RES
+            };
 
+            // Registers
+            sc_core::sc_signal<uint32_t> r_opa;
+            sc_core::sc_signal<uint32_t> r_opb;
+            sc_core::sc_signal<uint32_t> r_fsm;
 
-protected:
-	SC_HAS_PROCESS(FifoGcdCoprocessor);
+        protected:
+            SC_HAS_PROCESS(FifoGcdCoprocessor);
 
-public:
-	// ports
-		sc_core::sc_in<bool>				p_resetn;
-        sc_core::sc_in<bool> 				p_clk;
-		soclib::caba::FifoInput<uint32_t> 	p_in;
-        soclib::caba::FifoOutput<uint32_t> 	p_out;
-	// constructor & destructor
-		FifoGcdCoprocessor(sc_core::sc_module_name insname);
-		~FifoGcdCoprocessor();
-private:
-	// member functions
-		void transition();
-		void genMoore();
-}; // end class FifoGcdCoprocessor
+        public:
+            // ports
+            sc_core::sc_in<bool> p_clk;
+            sc_core::sc_in<bool> p_resetn;
+            soclib::caba::FifoInput<uint32_t> p_in;
+            soclib::caba::FifoOutput<uint32_t> p_out;
 
-}}
+            // constructor & destructor
+            FifoGcdCoprocessor(sc_core::sc_module_name insname);
+            ~FifoGcdCoprocessor();
 
-#endif 
+        private:
+            // member functions
+            void transition();
+            void genMoore();
+        }; // end class FifoGcdCoprocessor
+
+    }
+}
+
+#endif
 
 // Local Variables:
 // tab-width: 4
@@ -93,4 +98,3 @@ private:
 // End:
 
 // vim: filetype=cpp:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
-

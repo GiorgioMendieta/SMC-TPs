@@ -13,11 +13,13 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Publiciser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les vaiser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les vaiser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les valeurs opa et opb qui évoluent au cours du calculeurs opa et opb qui évoluent au cours du calculeurs opa et opb qui évoluent au cours du calcu
- * License along with SoCLib; iser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les valeurs opa et opb qui évoluent au cours du calcu
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SoCLib; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301 USA
  *
  * SOCLIB_LGPL_HEADER_END
- *iser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les valeurs opa et opb qui évoluent au cours du calcu
+ *
  * Copyright (c) UPMC, Lip6
  *         Alain Greiner <alain.greiner@lip6.fr>, 2009
  *
@@ -62,7 +64,7 @@ namespace soclib
                 DISPLAY,
             };
 
-            // Registersiser ce calcul doit donc comporter deux registres r_opa et r_opb pour stocker les valeurs opa et opb qui évoluent au cours du calcu
+            // Registers
             sc_core::sc_signal<int> r_fsm;
             sc_core::sc_signal<uint32_t> r_opa;
             sc_core::sc_signal<uint32_t> r_opb;
