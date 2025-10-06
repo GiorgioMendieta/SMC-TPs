@@ -1,23 +1,23 @@
 /* -*- c++ -*-
  *
  * SOCLIB_LGPL_HEADER_BEGIN
- *
+ * 
  * This file is part of SoCLib, GNU LGPLv2.1.
- *
+ * 
  * SoCLib is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; version 2.1 of the License.
- *
+ * 
  * SoCLib is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with SoCLib; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA
- *
+ * 
  * SOCLIB_LGPL_HEADER_END
  *
  * Copyright (c) UPMC, Lip6, Asim
@@ -30,55 +30,72 @@
 #define SOCLIB_EXCEPTION_H_
 
 #include <exception>
-#include <iostream>
 #include <string>
+#include <iostream>
 
-namespace soclib
+namespace soclib { namespace exception {
+
+class Exception
+    : public std::exception
 {
-    namespace exception
+    std::string m_type;
+    std::string m_message;
+
+public:
+    Exception( const std::string &type,
+               const std::string &message )
+            : m_type(type), m_message(message)
+    {}
+
+    virtual ~Exception() throw()
     {
+    }
 
-        class Exception : public std::exception
-        {
-            std::string m_type;
-            std::string m_message;
+    virtual const char * what() const throw()
+    {
+        return m_message.c_str();
+    }
 
-          public:
-            Exception(const std::string& type, const std::string& message) : m_type(type), m_message(message) {}
+    void print( std::ostream &o ) const
+    {
+        o << "<soclib::exception::" << m_type << ": " << m_message << ">";
+    }
 
-            virtual ~Exception() throw() {}
+    friend std::ostream &operator << (std::ostream &o, const Exception &e)
+    {
+        e.print(o);
+        return o;
+    }
+};
 
-            virtual const char* what() const throw() { return m_message.c_str(); }
+class ValueError
+    : public Exception
+{
+public:
+    ValueError( const std::string &message )
+            : Exception( "ValueError", message )
+    {}
+};
 
-            void print(std::ostream& o) const { o << "<soclib::exception::" << m_type << ": " << m_message << ">"; }
+class Collision
+    : public Exception
+{
+public:
+    Collision( const std::string &message )
+            : Exception( "Collision", message )
+    {}
+};
 
-            friend std::ostream& operator<<(std::ostream& o, const Exception& e)
-            {
-                e.print(o);
-                return o;
-            }
-        };
+class RunTimeError
+    : public Exception
+{
+public:
+    RunTimeError( const std::string &message )
+            : Exception( "RunTimeError", message )
+    {}
+};
 
-        class ValueError : public Exception
-        {
-          public:
-            ValueError(const std::string& message) : Exception("ValueError", message) {}
-        };
-
-        class Collision : public Exception
-        {
-          public:
-            Collision(const std::string& message) : Exception("Collision", message) {}
-        };
-
-        class RunTimeError : public Exception
-        {
-          public:
-            RunTimeError(const std::string& message) : Exception("RunTimeError", message) {}
-        };
-
-    } // namespace exception
-} // namespace soclib
+}}
 
 #endif /* SOCLIB_EXCEPTION_H_ */
 
@@ -90,3 +107,4 @@ namespace soclib
 // End:
 
 // vim: filetype=cpp:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
+

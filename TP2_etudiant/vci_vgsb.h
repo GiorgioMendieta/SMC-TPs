@@ -1,23 +1,23 @@
 /* -*- c++ -*-
  *
  * SOCLIB_LGPL_HEADER_BEGIN
- *
+ * 
  * This file is part of SoCLib, GNU LGPLv2.1.
- *
+ * 
  * SoCLib is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; version 2.1 of the License.
- *
+ * 
  * SoCLib is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with SoCLib; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301 USA
- *
+ * 
  * SOCLIB_LGPL_HEADER_END
  *
  * Copyright (c) UPMC, Lip6, SoC
@@ -28,7 +28,7 @@
 
 /////////////////////////////////////////////////////////////////////////
 // This component is a generic VCI compliant system bus interconnect
-// (one single VCI transaction at a given time). The general
+// (one single VCI transaction at a given time). The general 
 // behaviour reproduces the PIBUS behaviour.
 // The four VCI commands (READ, WRITE, LL, SC) are supported.
 // The two main functionnalities are :
@@ -40,18 +40,18 @@
 // The bus total throughput is N VCI word per (N+1) cycles
 // (one lost cycle between two transactions).
 // To reach this throughput, the bus is allocated in the IDLE state
-// (if the bus is not used), and in the RSP state (when the last word
+// (if the bus is not used), and in the RSP state (when the last word 
 // of the previous response packet is transfered).
 // With a fast target (no wait state) all transaction have a latency
 // of N+1 cycles (for VCI advanced packets) :
 // - READ transaction : one cycle for command, N cycles for response.
 // - WRITE transaction : N cycles for command, one cycle for response.
 //
-// The r_vci_counter[i][j] registers count the total number of transaction
-// requests for initiator i and target j.
+// The r_vci_counter[i][j] registers count the total number of transaction 
+// requests for initiator i and target j. 
 //
 // Implementation note :
-// This component uses the Segment Table to build the routing table ROM,
+// This component uses the Segment Table to build the routing table ROM, 
 // that decode the address MSB bits and gives the target index.
 // The data-path is implemented as two purely combinational multiplexors
 // for command & response packets respectively. Those multiplexors
@@ -65,71 +65,74 @@
 // This component has 4 "constructor" parameters :
 // - sc_module_name	name		: instance name
 // - pibusSegmentTable	segtab		: segment table
-// - int 		nb_master       : number of VCI initiators
-// - int 		nb_slave        : number of VCI targets
+// - int 		nb_master       : number of VCI initiators  
+// - int 		nb_slave        : number of VCI targets  
 //////////////////////////////////////////////////////////////////////////
 
 #ifndef VCI_VGSB_H
 #define VCI_VGSB_H
 
-#include "address_decoding_table.h"
-#include "mapping_table.h"
-#include "vci_initiator.h"
-#include "vci_target.h"
 #include <inttypes.h>
 #include <systemc>
+#include "mapping_table.h"
+#include "address_decoding_table.h"
+#include "vci_initiator.h"
+#include "vci_target.h"
 
-namespace soclib
+namespace soclib { namespace caba {
+
+/////////////////////////////
+template<typename vci_param>
+class VciVgsb  
+	: public sc_core::sc_module
 {
-    namespace caba
-    {
+	// FSM states
+	enum vgsb_fms_state_e {
+	FSM_IDLE,
+	FSM_CMD,
+	FSM_RSP,
+	};
 
-        /////////////////////////////
-        template <typename vci_param> class VciVgsb : public sc_core::sc_module
-        {
-            // FSM states
-            enum vgsb_fms_state_e
-            {
-                FSM_IDLE,
-                FSM_CMD,
-                FSM_RSP,
-            };
+	// Registers
+	sc_signal<int> 							r_fsm;
+	sc_signal<size_t>						r_initiator_index;
+	sc_signal<size_t>						r_target_index;
+	sc_signal<uint32_t>						**r_vci_counter;	
+	
+	// constants
+	const soclib::common::AddressDecodingTable<uint32_t, int> 	m_routing_table;
+	const size_t 							m_nb_initiator;	
+	const size_t 							m_nb_target;
 
-            // Registers
-            sc_signal<int> r_fsm;
-            sc_signal<size_t> r_initiator_index;
-            sc_signal<size_t> r_target_index;
-            sc_signal<uint32_t>** r_vci_counter;
+protected:
 
-            // constants
-            const soclib::common::AddressDecodingTable<uint32_t, int> m_routing_table;
-            const size_t m_nb_initiator;
-            const size_t m_nb_target;
+	SC_HAS_PROCESS(VciVgsb);
 
-          protected:
-            SC_HAS_PROCESS(VciVgsb);
+public:
 
-          public:
-            // Ports
-            sc_in<bool> p_clk;
-            sc_in<bool> p_resetn;
-            soclib::caba::VciInitiator<vci_param>* p_to_target;
-            soclib::caba::VciTarget<vci_param>* p_to_initiator;
+	// Ports
+	sc_in<bool>  							p_clk;	 
+	sc_in<bool>  							p_resetn;  
+	soclib::caba::VciInitiator<vci_param> 				*p_to_target;
+	soclib::caba::VciTarget<vci_param>    				*p_to_initiator;
 
-            // constructor & destructor
-            VciVgsb(sc_module_name name, soclib::common::MappingTable& maptab, size_t nb_master, size_t nb_slave);
-            ~VciVgsb();
+	// constructor & destructor
+	VciVgsb(	sc_module_name 			name,
+			soclib::common::MappingTable 	&maptab,
+			size_t				nb_master,
+			size_t				nb_slave);
+	~VciVgsb();
 
-            // member functions
-            void transition();
-            void genMealy_rspval();
-            void genMealy_rspack();
-            void genMealy_cmdval();
-            void genMealy_cmdack();
 
-        }; // end class VciVgsb
+	// member functions
+	void transition(); 
+	void genMealy_rspval();
+	void genMealy_rspack();
+	void genMealy_cmdval();
+	void genMealy_cmdack();
 
-    } // namespace caba
-} // namespace soclib
+}; // end class VciVgsb
+
+}} // end namespace
 
 #endif
