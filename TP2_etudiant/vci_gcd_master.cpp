@@ -78,7 +78,7 @@ template<typename vci_param>
 void VciGcdMaster<vci_param>::transition()
 {
 	if ( !p_resetn.read() ) {
-		r_fsm = A COMPLETER
+		r_fsm = RANDOM;
 		r_cycle = 0;
 		r_iter = 0;
 		return;
@@ -94,64 +94,64 @@ std::cout << name() << "  opb = " << r_opb.read() << std::endl;
 	switch ( r_fsm ) {
 	case RANDOM :
 		r_iter = r_iter.read() + 1;
-		r_opa = A COMPLETER
-		r_opb = A COMPLETER
-		r_fsm = A COMPLETER
+		r_opa = rand();
+		r_opb = rand();
+		r_fsm = CMD_OPA;
 		break;
 	case CMD_OPA :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RESP_OPA;
 		}
 		break;
 	case RSP_OPA :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_OPB;
 		}
 		break;
 	case CMD_OPB :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_OPB;
 		}
 		break;
 	case RSP_OPB :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_START;
 		}
 		break;
 	case CMD_START :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_START;
 		}
 		break;
 	case RSP_START :
 		if ( p_vci.rspval.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = CMD_STATUS;
 		}
 		break;
 	case CMD_STATUS :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_STATUS;
 		}
 		break;
 	case RSP_STATUS :
 		if ( p_vci.rspval.read() ) {
-			if( p_vci.rdata.read() == 0 )	r_fsm = A COMPLETER
-			else				r_fsm = A COMPLETER
+			if( p_vci.rdata.read() == 0 )	r_fsm = CMD_RESULT;
+			else				r_fsm = CMD_STATUS;
 		}
 		break;
 	case CMD_RESULT :
 		if ( p_vci.cmdack.read() ) {
-			r_fsm = A COMPLETER
+			r_fsm = RSP_RESULT;
 		}
 		break;
 	case RSP_RESULT :
 		if ( p_vci.rspval.read() ) {
-			r_res = A COMPLETER
-			r_fsm = A COMPLETER
+			r_res = p_vci.rdata.read();
+			r_fsm = DISPLAY;
 		}
 		break;
 	case DISPLAY :
-		r_fsm = A COMPLETER
+		r_fsm = RANDOM;
 		std::cout << std::dec << std::noshowbase;
 		std::cout << "*** " << name() << " *** iteration " << r_iter.read() << std::endl;
 		std::cout << "  cycle  = " << r_cycle.read() << std::endl;
@@ -171,10 +171,10 @@ template<typename vci_param>
 void VciGcdMaster<vci_param>::genMoore()
 {
 	// contant VCI command fields
-	p_vci.be 	= A COMPLETER 	// no masking
-	p_vci.plen	= A COMPLETER	// all transactions are single flit
-	p_vci.eop	= A COMPLETER	// all transactions are single flit
-	p_vci.srcid	= A COMPLETER	// initiator ID
+	p_vci.be 	= 0; 	// no masking
+	p_vci.plen	= 8;	// all transactions are single flit
+	p_vci.eop	= 1;	// all transactions are single flit
+	p_vci.srcid	= m_srcid;	// initiator ID
 	p_vci.trdid	= 0;		// unused
 	p_vci.pktid	= 0;		// unused
 	p_vci.contig	= true;		// unused
@@ -186,59 +186,59 @@ void VciGcdMaster<vci_param>::genMoore()
 	switch ( r_fsm.read() ) {
 	case RANDOM : 
         case DISPLAY :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= 0;
+		p_vci.rspack	= false;
 		break; 
 	case CMD_OPA :
 		p_vci.cmdval	= true;
-		p_vci.cmd	= vci_param::CMD_WRITE;
+		p_vci.cmd		= vci_param::CMD_WRITE;
 		p_vci.address	= m_base + 4*GCD_OPA;
-		p_vci.wdata	= r_opa;
+		p_vci.wdata		= r_opa;
 		p_vci.rspack	= false;
 		break; 
 	case CMD_OPB :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= true;
+		p_vci.cmd		= vci_param::CMD_WRITE;
+		p_vci.address	= m_base + 4*GCD_OPB;
+		p_vci.wdata		= r_opb;
+		p_vci.rspack	= false;
 		break; 
 	case CMD_START :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= true;
+		p_vci.cmd		= vci_param::CMD_WRITE;
+		p_vci.address	= m_base + 4*GCD_START;
+		p_vci.wdata		= 1;
+		p_vci.rspack	= false;
 		break; 
 	case CMD_RESULT :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= true;
+		p_vci.cmd		= vci_param::CMD_READ;
+		p_vci.address	= m_base + 4*GCD_OPA;
+		p_vci.wdata		= 0;
+		p_vci.rspack	= false;
 		break; 
 	case CMD_STATUS :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= true;
+		p_vci.cmd		= vci_param::CMD_READ;
+		p_vci.address	= m_base + 4*GCD_STATUS;
+		p_vci.wdata		= 0;
+		p_vci.rspack = false;
 		break; 
 	case RSP_OPA :
 	case RSP_OPB :
 	case RSP_START :
 	case RSP_RESULT :
 	case RSP_STATUS :
-		p_vci.cmdval	= A COMPLETER
-		p_vci.cmd	= A COMPLETER;
-		p_vci.address	= A COMPLETER
-		p_vci.wdata	= A COMPLETER
-		p_vci.rspack	= A COMPLETER
+		p_vci.cmdval	= false;
+		p_vci.cmd		= 0;
+		p_vci.address	= m_base;
+		p_vci.wdata		= 0;
+		p_vci.rspack	= true;
 		break; 
      } // end switch
 } // end genMoore()
 
-template class VciGcdMaster<soclib::caba::VciParams<A COMPLETER>;
+template class VciGcdMaster<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1>>;
 
 }}
 

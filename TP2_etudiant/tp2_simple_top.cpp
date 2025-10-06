@@ -7,7 +7,7 @@
 #include "vci_param.h"
 #include "mapping_table.h"
 
-#define GCD_BASE	A COMPLETER
+#define GCD_BASE	0x03000000 // NOT SURE
 #define GCD_SIZE	16
 	
 int sc_main(int argc, char *argv[])
@@ -28,7 +28,7 @@ int sc_main(int argc, char *argv[])
 	// 	pktid_size	= 1;
 	// 	wrplen_size	= 1;
 
-	typedef VciParams< TO BE COMPLETED > vci_param;
+	typedef VciParams< 4, 8, 32, 1, 1, 1, 12, 1, 1, 1 > vci_param;
 
 	///////////////////////////////////////////////////////////////////////////
 	// simulation arguments : number of cycles & seed for the random generation
@@ -55,8 +55,8 @@ int sc_main(int argc, char *argv[])
 	//////////////////////////////////////////////////////////////////////////
 	// Components
 	//////////////////////////////////////////////////////////////////////////
-	VciGcdMaster<vci_param> 		master(TO BE COMPLETED);
-	VciGcdCoprocessor<vci_param>	coproc(TO BE COMPLETED);
+	VciGcdMaster<vci_param> 		master("master", IntTab(0), maptab, seed, GCD_BASE);
+	VciGcdCoprocessor<vci_param>	coproc("coproc", IntTab(0), maptab);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Net-List
