@@ -90,7 +90,7 @@ namespace soclib
             case CMD_OPA:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = RESP_OPA;
+                    r_fsm = RSP_OPA;
                 }
                 break;
             case RSP_OPA:

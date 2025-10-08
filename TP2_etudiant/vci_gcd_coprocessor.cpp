@@ -119,7 +119,7 @@ namespace soclib
                     // test the command
                     if ((p_vci.cmd.read() == vci_param::CMD_READ) && (cell == GCD_OPA))
                     {
-                        r_vci_fsm = VCI_RESP_RESULT;
+                        r_vci_fsm = VCI_RSP_RESULT;
                     }
                     else if ((p_vci.cmd.read() == vci_param::CMD_READ) && (cell == GCD_STATUS))
                     {
@@ -128,12 +128,12 @@ namespace soclib
                     else if ((p_vci.cmd.read() == vci_param::CMD_WRITE) && (cell == GCD_OPA))
                     {
                         r_opa     = p_vci.wdata.read();
-                        r_vci_fsm = VCI_RESP_OPA;
+                        r_vci_fsm = VCI_RSP_OPA;
                     }
                     else if ((p_vci.cmd.read() == vci_param::CMD_WRITE) && (cell == GCD_OPB))
                     {
                         r_opb     = p_vci.wdata.read();
-                        r_vci_fsm = VCI_RESP_OPB;
+                        r_vci_fsm = VCI_RSP_OPB;
                     }
                     else if ((p_vci.cmd.read() == vci_param::CMD_WRITE) && (cell == GCD_START))
                     {
