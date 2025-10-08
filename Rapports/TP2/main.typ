@@ -107,6 +107,7 @@ Dans cette section, on présente différentes classes C++ définies par la plate
 
 On assigne à tout composant matériel possédant un port VCI (composant cible ou composant initiateur) un index permettant de l'identifier de façon unique. Cet index peut être éventuellement structuré (on parle d'index composite) si l'architecture est structurée en clusters. Un index composite est la concaténation d'un index global (le numéro de cluster) et d'un index local (à l'intérieur d'un cluster).
 
+// Note: Important
 La plate-forme SoCLib définit la classe C++ `IntTab` pour représenter ces index composites. (voir fichier `int_tab.h`). Dans ce TP, on utilisera un seul niveau d'indexation, mais il faut utiliser l'objet `IntTab` pour indexer les composants VCI.
 
 == Segmentation de l'espace addressable
@@ -149,6 +150,8 @@ On a parfois besoin d'utiliser des tableaux d'objets complexes. Par exemple, le 
 ) <vci_gcd_coprocessor>
 
 
+Le composant VciGcdCoprocessor est un périphérique adressable, et doit donc être modélisé comme une cible VCI. Il possède un seul port de type VciTarget, et 4 registres (ou pseudo-registres) implantés dans l'espace addressable, qui peuvent donc - en principe - être lus ou écrits par n'importe quel initiateur du sytème.
+*Chacun de ces registres a une largeur de 4 octets. Par conséquent, le segment occupé par ce périphérique dans l'espace adressable a une longueur de 4*4 = 16 octets.*
 
 // TODO:
 _*Question 3* : Pourquoi faut-t-il deux automates séparés pour contrôler l'interface VCI et pour contrôler le calcul du PGCD proprement dit ?_
@@ -194,3 +197,86 @@ _*Question 5* : comment sont traitées les erreurs dans ce modèle de simulation
   image("soclib_tp2_bus.png", width: 80%),
   caption: [Architecture multi-maîtres / multi-cibles avec bus VCI],
 ) <multi_bus_archi>
+
+
+= VciGcdCoprocessor
+
+Enfin, comme tous les modèles CABA de SoCLib, le coprocesseur GCD possède des fonctions membres définissant le comportement du composant, qui sont de trois types :
+
+la fonction transition() est sensible au *front montant* du port d'entrée CK, et permet de calculer la valeur future des registres en fonction de la valeur courante des registres et des valeurs présentes sur les autres ports d'entrée.
+
+la fonction genMoore() est sensible au *front descendant* du port d'entrée CK, et permet de calculer la valeur des ports de sortie qui ne dépendent que des valeurs stockées dans les registres.
+
+les fonctions genMealy() (une ou plusieurs fonctions) sont sensibles au *front descendant* du port CK. De plus chaque fonction est sensible à un ensemble particulier de port d'entrée. Elle permettent de calculer la valeur des ports de sorties qui dépendent de façon combinatoire d'un ou plusieurs ports d'entrée.
+
+
+```cpp
+SC_METHOD(transition);
+dont_initialize();
+sensitive << p_clk.pos();
+
+SC_METHOD(genMoore);
+dont_initialize();
+sensitive << p_clk.neg();
+```
+
+Le coprocesseur a deux automates : un automate `vci_fsm` qui contrôle l'interface VCI, et un automate `exe_fsm` qui contrôle le calcul du PGCD proprement dit.
+
+Au reset, les automates sont initialisés dans l'état `VCI_GET_CMD` (attente d'une commande VCI) et `EXE_IDLE` (attente d'un calcul).
+
+```cpp
+if (!p_resetn.read())
+{
+  r_vci_fsm = VCI_GET_CMD;
+  r_exe_fsm = EXE_IDLE;
+  return;
+}
+```
+
+Après, nous avons complété les transitions des deux automates d'après le diagramme d'état fourni dans l'énoncé.
+
+== MAE EXE
+
+Pour les états EXE_DECA et EXE_DECB, nous avons complété les opérations de décrémentation des registres opa et opb, ainsi que les transitions vers l'état EXE_COMPARE.
+
+== MAE VCI
+
+Cette machine á ètats est un peu plus complèxe, car elle doit gérer les deux types de transactions VCI (lecture et écriture). Nous avons complété les transitions d'états en fonction du diagramme d'état fourni dans l'énoncé.
+
+Les commandes VCI sont stockées dans des registres lors de la réception d'une commande valide (CMDVAL et CMDACK à 1). Nous avons complété le code pour stocker les champs SRCID, TRDID et PKTID dans des registres.
+
+Rappel:
+- le paramètre S définit le nombre de bits du champs SRCID, qui permet de coder le numéro de l'initiateur VCI qui a démarré la transaction. Ce paramètre définit donc le nombre maximum d'initiateurs dans le système.
+- Le paramètre E définit le nombre de bits permettant de coder le type d'erreur dans le champs RERROR du paquet commande. RERROR = 0 signifie "pas d'erreur".
+- Les deux paramètres T et P définissent le nombre de bits des deux champs TRDID et PKTID. Ces deux champs permettent d'étiqueter une commande VCI par une numéro de thread et/ou par un numéro de transaction. Ils peuvent être utilisés par un initiateur pour envoyer une commande (n+1) sans attendre d'avoir reçu la réponse à la commande (n).
+
+=== Commandes VCI
+l'automate vci_fsm contrôle l'interface VCI : il répond aux commandes qu'il reçoit, en écrivant dans le registre concerné s'il sagit d'une écriture, ou en renvoyant la valeur demandée s'il s'agit d'une lecture.
+
+```cpp
+// store the VCI command in registers
+r_srcid = p_vci.srcid.read();
+r_trdid = p_vci.trdid.read();
+r_pktid = p_vci.pktid.read();
+```
+
+
+= VCI master
+
+L'etat initial est RANDOM, dans lequel on génère des opérandes aléatoires. On passe à l'état SEND_CMD_WRITE pour envoyer la commande d'écriture des opérandes au coprocesseur.
+
+
+2. VCI Parameters Template
+VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1>
+These parameters correspond to the commented field widths:
+
+4 → cell_size = 4 - Data cell size in bytes (32-bit words)
+8 → plen_size = 8 - Packet length field width (8 bits)
+32 → addr_size = 32 - Address field width (32 bits)
+1 → rerror_size = 1 - Response error field width (1 bit)
+1 → clen_size = 1 - Cache line length field width (1 bit)
+1 → rflag_size = 1 - Response flag field width (1 bit)
+12 → srcid_size = 12 - Source ID field width (12 bits = up to 4096 initiators)
+1 → trdid_size = 1 - Thread ID field width (1 bit)
+1 → pktid_size = 1 - Packet ID field width (1 bit)
+1 → wrplen_size = 1 - Write packet length field width (1 bit)
