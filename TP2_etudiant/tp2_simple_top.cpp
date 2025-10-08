@@ -7,8 +7,13 @@
 #include "vci_param.h"
 #include "vci_signals.h"
 
-#define GCD_BASE 0x03000000 // NOT SURE
-#define GCD_SIZE 16
+/*
+In this this example, we have three initiators and three targets.
+
+
+*/
+#define GCD_BASE 0x50000
+#define GCD_SIZE 1 << 4 // 2 ^ 4 = 16 bits
 
 int sc_main(int argc, char* argv[])
 {
@@ -28,7 +33,10 @@ int sc_main(int argc, char* argv[])
     // 	pktid_size	= 1;
     // 	wrplen_size	= 1;
 
-    typedef VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
+    // VCI parameters list (see vci_param.h for details)
+    // <int cell_size, int plen_size, int addr_size, int rerror_size, int clen_size, int rflag_size,
+    //    int srcid_size, int pktid_size, int trdid_size,
+    int wrplen_size > typedef VciParams<4, 4, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
 
     ///////////////////////////////////////////////////////////////////////////
     // simulation arguments : number of cycles & seed for the random generation
@@ -57,8 +65,8 @@ int sc_main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////
     // Components
     //////////////////////////////////////////////////////////////////////////
-    VciGcdMaster<vci_param> master("master", IntTab(0), maptab, seed, GCD_BASE);
-    VciGcdCoprocessor<vci_param> coproc("coproc", IntTab(0), maptab);
+    VciGcdMaster<vci_param> master("gcd_master", IntTab(0), maptab, seed, GCD_BASE);
+    VciGcdCoprocessor<vci_param> coproc("gcd_coprocessor", IntTab(0), maptab);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
