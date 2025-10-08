@@ -18,7 +18,7 @@ segment.o :
 	$(CC) $(CFLAGS) $(CTOOLS) segment.cpp
 
 vci_gcd_coprocessor.o :
-	$(CC) $(CFLAGS) $(CTOOLS) vci_gcd_coprocessor.cpp -o fifo_gcd_coprocessor.o
+	$(CC) $(CFLAGS) $(CTOOLS) vci_gcd_coprocessor.cpp -o vci_gcd_coprocessor.o
 
 vci_gcd_master.o :
 	$(CC) $(CFLAGS) $(CTOOLS) vci_gcd_master.cpp
