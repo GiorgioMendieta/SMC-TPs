@@ -7,8 +7,18 @@
 #include "vci_param.h"
 #include "vci_signals.h"
 
-#define GCD_BASE /* TODO: A COMPLETER */ ...
-#define GCD_SIZE /* TODO: A COMPLETER */ ...
+// Base address and size of the GCD memory-mapped peripheral
+#define GCD_BASE 0x03000000
+// 4 registers of 4 bytes each
+/*
+The GCD has 4 registers, each 4 bytes (32-bit):
+GCD_OPA (offset 0): Operand A
+GCD_OPB (offset 4): Operand B
+GCD_START (offset 8): Start command
+GCD_STATUS (offset 12): Status register
+Total: 4 × 4 = 16 bytes
+*/
+#define GCD_SIZE (1 << 4)
 
 int sc_main(int argc, char* argv[])
 {
@@ -28,7 +38,7 @@ int sc_main(int argc, char* argv[])
     // 	pktid_size	= 1;
     // 	wrplen_size	= 1;
 
-    typedef VciParams</* TODO: A COMPLETER */> vci_param;
+    typedef VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
 
     ///////////////////////////////////////////////////////////////////////////
     // simulation arguments : number of cycles & seed for the random generation
@@ -57,8 +67,14 @@ int sc_main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////
     // Components
     //////////////////////////////////////////////////////////////////////////
-    VciGcdMaster<vci_param> master(/* TODO: A COMPLETER */);
-    VciGcdCoprocessor<vci_param> coproc(/* TODO: A COMPLETER */);
+    /* Note: Dans ce TP, on utilisera *un seul niveau d'indexation* (cf. int_tab.h),
+    alors que SoCLib utilise des index composites. */
+
+    // VciGcdMaster(sc_module_name insname, const IntTab& index, const MappingTable& mt, const int seed,
+    // const typename addr_t base);
+    VciGcdMaster<vci_param> master("gcd_master", IntTab(0), maptab, seed, GCD_BASE);
+    // VciGcdCoprocessor(sc_module_name insname, const IntTab& index, const MappingTable& mt);
+    VciGcdCoprocessor<vci_param> coproc("gcd_coprocessor", IntTab(0), maptab);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List

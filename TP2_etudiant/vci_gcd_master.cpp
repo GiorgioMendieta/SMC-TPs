@@ -49,11 +49,11 @@ namespace soclib
         {
             SC_METHOD(transition);
             dont_initialize();
-            sensitive << ; // TODO: A COMPLETER
+            sensitive << p_clk.pos();
 
             SC_METHOD(genMoore);
             dont_initialize();
-            sensitive << ; // TODO: A COMPLETER
+            sensitive << p_clk.neg();
 
             srand(seed);
         }
@@ -66,7 +66,7 @@ namespace soclib
         {
             if (!p_resetn.read())
             {
-                r_fsm   = ; // TODO: A COMPLETER
+                r_fsm   = RANDOM;
                 r_cycle = 0;
                 r_iter  = 0;
                 return;
@@ -81,78 +81,88 @@ namespace soclib
 
             switch (r_fsm)
             {
+            // Calculate random operands and go to send the command to write the first operand
             case RANDOM:
                 r_iter = r_iter.read() + 1;
-                r_opa  = ; // TODO: A COMPLETER
-                r_opb  = ; // TODO: A COMPLETER
-                r_fsm  = ; // TODO: A COMPLETER
+                r_opa  = rand();
+                r_opb  = rand();
+                r_fsm  = CMD_OPA;
                 break;
+            // Send command to write the first operand
             case CMD_OPA:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = RSP_OPA;
                 }
                 break;
+            // Once we get an acknowledgment, we can go to send the second operand
             case RSP_OPA:
                 if (p_vci.rspval.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = CMD_OPB;
                 }
                 break;
+            // Send command to write the second operand
             case CMD_OPB:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = RSP_OPB;
                 }
                 break;
+            // Once we get both operands acknowledged, we move to the start state
             case RSP_OPB:
                 if (p_vci.rspval.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = CMD_START;
                 }
                 break;
             case CMD_START:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = RSP_START;
                 }
                 break;
             case RSP_START:
                 if (p_vci.rspval.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = CMD_STATUS;
                 }
                 break;
             case CMD_STATUS:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = RSP_STATUS;
                 }
                 break;
+            // This state is used to poll the coprocesor until it is done
+            // If the status is 0, it means the coprocesor is idle and we can get the result
+            // If the status is 1, it means the coprocesor is still busy and we need to poll again
             case RSP_STATUS:
                 if (p_vci.rspval.read())
                 {
                     if (p_vci.rdata.read() == 0)
-                        r_fsm = ; // TODO: A COMPLETER
+                        r_fsm = CMD_RESULT;
                     else
-                        r_fsm = ; // TODO: A COMPLETER
+                        r_fsm = CMD_STATUS;
                 }
                 break;
             case CMD_RESULT:
                 if (p_vci.cmdack.read())
                 {
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_fsm = RSP_RESULT;
                 }
                 break;
+            // Once the result is ready, we can read it and go to the display state
             case RSP_RESULT:
                 if (p_vci.rspval.read())
                 {
-                    r_res = ; // TODO: A COMPLETER
-                    r_fsm = ; // TODO: A COMPLETER
+                    r_res = p_vci.rdata.read();
+                    r_fsm = RSP_RESULT;
                 }
                 break;
+            // Display the result and go back to the initial state to start a new calculation
             case DISPLAY:
-                r_fsm = ; // TODO: A COMPLETER
+                r_fsm = RANDOM;
                 std::cout << std::dec << std::noshowbase;
                 std::cout << "*** " << name() << " *** iteration " << r_iter.read() << std::endl;
                 std::cout << "  cycle  = " << r_cycle.read() << std::endl;
@@ -168,27 +178,28 @@ namespace soclib
         } // end transition()
 
         //////////////////////////////
+        // genMoore: Combinational logic to generate output signals based on the current state
         template <typename vci_param> void VciGcdMaster<vci_param>::genMoore()
         {
             // contant VCI command fields
-            p_vci.be     = ;      // TODO: A COMPLETER 	// no masking
-            p_vci.plen   = ;      // TODO: A COMPLETER	// all transactions are single flit
-            p_vci.eop    = ;      // TODO: A COMPLETER	// all transactions are single flit
-            p_vci.srcid  = ;      // TODO: A COMPLETER	// initiator ID
-            p_vci.trdid  = 0;     // unused
-            p_vci.pktid  = 0;     // unused
-            p_vci.contig = true;  // unused
-            p_vci.cons   = false; // unused
-            p_vci.wrap   = false; // unused
-            p_vci.cfixed = false; // unused
-            p_vci.clen   = 0;     // unused
+            p_vci.be     = 0;       // no masking
+            p_vci.plen   = 4;       // all transactions are single flit (4 bytes = 32 bits)
+            p_vci.eop    = true;    // all transactions are single flit
+            p_vci.srcid  = m_srcid; // initiator ID
+            p_vci.trdid  = 0;       // unused
+            p_vci.pktid  = 0;       // unused
+            p_vci.contig = true;    // unused
+            p_vci.cons   = false;   // unused
+            p_vci.wrap   = false;   // unused
+            p_vci.cfixed = false;   // unused
+            p_vci.clen   = 0;       // unused
 
             switch (r_fsm.read())
             {
             case RANDOM:
             case DISPLAY:
-                p_vci.cmdval = ; // TODO: A COMPLETER
-                p_vci.rspack = ; // TODO: A COMPLETER
+                p_vci.cmdval = false;
+                p_vci.rspack = false;
                 break;
             case CMD_OPA:
                 p_vci.cmdval  = true;
@@ -198,48 +209,48 @@ namespace soclib
                 p_vci.rspack  = false;
                 break;
             case CMD_OPB:
-                p_vci.cmdval  = ; // TODO: A COMPLETER
-                p_vci.cmd     = ; // TODO: A COMPLETER
-                p_vci.address = ; // TODO: A COMPLETER
-                p_vci.wdata   = ; // TODO: A COMPLETER
-                p_vci.rspack  = ; // TODO: A COMPLETER
+                p_vci.cmdval  = true;
+                p_vci.cmd     = vci_param::CMD_WRITE;
+                p_vci.address = m_base + 4 * GCD_OPB;
+                p_vci.wdata   = r_opb;
+                p_vci.rspack  = false;
                 break;
             case CMD_START:
-                p_vci.cmdval  = ; // TODO: A COMPLETER
-                p_vci.cmd     = ; // TODO: A COMPLETER
-                p_vci.address = ; // TODO: A COMPLETER
-                p_vci.wdata   = ; // TODO: A COMPLETER
-                p_vci.rspack  = ; // TODO: A COMPLETER
+                p_vci.cmdval  = true;
+                p_vci.cmd     = vci_param::CMD_WRITE;
+                p_vci.address = m_base + 4 * GCD_START;
+                p_vci.wdata   = 1;
+                p_vci.rspack  = false;
                 break;
             case CMD_RESULT:
-                p_vci.cmdval  = ; // TODO: A COMPLETER
-                p_vci.cmd     = ; // TODO: A COMPLETER
-                p_vci.address = ; // TODO: A COMPLETER
-                p_vci.wdata   = ; // TODO: A COMPLETER
-                p_vci.rspack  = ; // TODO: A COMPLETER
+                p_vci.cmdval  = true;
+                p_vci.cmd     = vci_param::CMD_READ;
+                p_vci.address = m_base + 4 * GCD_OPA;
+                p_vci.wdata   = 0;
+                p_vci.rspack  = false;
                 break;
             case CMD_STATUS:
-                p_vci.cmdval  = ; // TODO: A COMPLETER
-                p_vci.cmd     = ; // TODO: A COMPLETER
-                p_vci.address = ; // TODO: A COMPLETER
-                p_vci.wdata   = ; // TODO: A COMPLETER
-                p_vci.rspack  = ; // TODO: A COMPLETER
+                p_vci.cmdval  = true;
+                p_vci.cmd     = vci_param::CMD_READ;
+                p_vci.address = m_base + 4 * GCD_STATUS;
+                p_vci.wdata   = 0;
+                p_vci.rspack  = false;
                 break;
             case RSP_OPA:
             case RSP_OPB:
             case RSP_START:
             case RSP_RESULT:
             case RSP_STATUS:
-                p_vci.cmdval  = ; // TODO: A COMPLETER
-                p_vci.cmd     = ; // TODO: A COMPLETER;
-                p_vci.address = ; // TODO: A COMPLETER
-                p_vci.wdata   = ; // TODO: A COMPLETER
-                p_vci.rspack  = ; // TODO: A COMPLETER
+                p_vci.cmdval  = false;
+                p_vci.cmd     = 0;
+                p_vci.address = m_base;
+                p_vci.wdata   = 0;
+                p_vci.rspack  = true;
                 break;
             } // end switch
         } // end genMoore()
 
-        template class VciGcdMaster < soclib::caba::VciParams < ; // TODO: A COMPLETER>;
+        template class VciGcdMaster<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1>>;
 
     } // namespace caba
 } // namespace soclib
