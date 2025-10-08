@@ -215,7 +215,7 @@ If calculation is still running, rspval = false (no response yet)*/
             }
         } // end genMoore()
 
-        template class VciGcdCoprocessor<soclib::caba::VciParams<4, 4, 32, 1, 1, 1, 12, 1, 1, 1>>;
+        template class VciGcdCoprocessor<soclib::caba::VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1>>;
 
     } // namespace caba
 } // namespace soclib
