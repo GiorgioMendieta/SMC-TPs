@@ -36,7 +36,7 @@ int sc_main(int argc, char* argv[])
     // VCI parameters list (see vci_param.h for details)
     // <int cell_size, int plen_size, int addr_size, int rerror_size, int clen_size, int rflag_size,
     //    int srcid_size, int pktid_size, int trdid_size,
-    int wrplen_size > typedef VciParams<4, 4, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
+    typedef VciParams<4, 8, 32, 1, 1, 1, 12, 1, 1, 1> vci_param;
 
     ///////////////////////////////////////////////////////////////////////////
     // simulation arguments : number of cycles & seed for the random generation
