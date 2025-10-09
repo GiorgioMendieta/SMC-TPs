@@ -4,6 +4,7 @@ CTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/cctools/include -m32 -c
 FASTTOOLS=-std=gnu++0x -I. -I /users/outil/dsx/systemcass/include -m32 -c
 
 all: simple_simulator.x
+	mv *.o ./bin/
 	
 address_decoding_table.o :
 	$(CC) $(CFLAGS) $(CTOOLS) address_decoding_table.cpp
@@ -33,6 +34,6 @@ simple_simulator.x : address_decoding_table.o address_masking_table.o mapping_ta
 	$(CC) $(CFLAGS) -m32 -L. -L/users/outil/dsx/cctools/lib-linux -o simple_simulator.x address_decoding_table.o address_masking_table.o mapping_table.o segment.o vci_vgsb.o vci_gcd_master.o vci_gcd_coprocessor.o tp2_simple_top.o -lsystemc 2>&1
 
 clean :
-	rm -f *.o 
+	rm -f ./bin/*.o 
 	rm -f *.x
 	
