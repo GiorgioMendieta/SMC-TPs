@@ -31,6 +31,8 @@
 #include "gcd.h"
 #include "vci_gcd_coprocessor.h"
 
+// #define SOCLIB_MODULE_DEBUG
+
 using namespace sc_core;
 using namespace soclib::caba;
 
@@ -172,9 +174,9 @@ namespace soclib
         {
             // sorties indépendantes de l'état de l'automate
             // These are the response signals of the VCI interface
-            p_vci.rsrcid = r_srcid; // rappel du SRCID pour retourner vers l’initiateur correct
-            p_vci.rtrdid = r_trdid; // rappel du TRDID pour rattacher la RSP à la bonne CMD
-            p_vci.rpktid = r_pktid; // Response packet ID
+            p_vci.rsrcid = r_srcid.read(); // rappel du SRCID pour retourner vers l’initiateur correct
+            p_vci.rtrdid = r_trdid.read(); // rappel du TRDID pour rattacher la RSP à la bonne CMD
+            p_vci.rpktid = r_pktid.read(); // Response packet ID
             p_vci.rerror = false;   // indication d’erreur (pas d’erreur)
             p_vci.reop   = true;    // fin de paquet de réponse
 

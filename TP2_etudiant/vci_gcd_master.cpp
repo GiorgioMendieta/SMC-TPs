@@ -31,6 +31,8 @@
 #include "gcd.h"
 #include "vci_gcd_master.h"
 
+// #define SOCLIB_MODULE_DEBUG
+
 using namespace sc_core;
 using namespace soclib::caba;
 
@@ -157,7 +159,7 @@ namespace soclib
                 if (p_vci.rspval.read())
                 {
                     r_res = p_vci.rdata.read();
-                    r_fsm = RSP_RESULT;
+                    r_fsm = DISPLAY;
                 }
                 break;
             // Display the result and go back to the initial state to start a new calculation

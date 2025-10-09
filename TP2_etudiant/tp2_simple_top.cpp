@@ -8,7 +8,7 @@
 #include "vci_signals.h"
 
 // Base address and size of the GCD memory-mapped peripheral
-#define GCD_BASE 0x03000000
+#define GCD_BASE 0x00000000
 // 4 registers of 4 bytes each
 /*
 The GCD has 4 registers, each 4 bytes (32-bit):
