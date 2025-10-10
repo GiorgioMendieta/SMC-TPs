@@ -10,9 +10,9 @@
 
 // We have 3 masters and 3 coprocessors, so we need 3 different base addresses
 // Base address and size of the GCD memory-mapped peripheral
-#define GCD0_BASE 0x00000000
-#define GCD1_BASE 0x00000010
-#define GCD2_BASE 0x00000020
+#define GCD0_BASE 0x10000000
+#define GCD1_BASE 0x20000000
+#define GCD2_BASE 0x30000000
 // Every master has the same size, so we only need to define it one time
 // 4 registers of 4 bytes each = 16 bytes or 0x10
 #define GCD_SIZE (1 << 4)
