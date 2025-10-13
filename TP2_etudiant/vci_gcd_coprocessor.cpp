@@ -177,8 +177,8 @@ namespace soclib
             p_vci.rsrcid = r_srcid.read(); // rappel du SRCID pour retourner vers l’initiateur correct
             p_vci.rtrdid = r_trdid.read(); // rappel du TRDID pour rattacher la RSP à la bonne CMD
             p_vci.rpktid = r_pktid.read(); // Response packet ID
-            p_vci.rerror = false;   // indication d’erreur (pas d’erreur)
-            p_vci.reop   = true;    // fin de paquet de réponse
+            p_vci.rerror = false;          // indication d’erreur (pas d’erreur)
+            p_vci.reop   = true;           // fin de paquet de réponse
 
             switch (r_vci_fsm)
             {

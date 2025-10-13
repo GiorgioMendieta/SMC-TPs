@@ -8,13 +8,23 @@
 #include "vci_signals.h"
 #include "vci_vgsb.h" // VCI VGSB bus
 
-// We have 3 masters and 3 coprocessors, so we need 3 different base addresses
+/*
+- Define base address of each component
+- Define segment sizes of the components
+- Define VCI parameters
+- Add segments to the mapping table
+- Instantiate the different components (initiators, targets, bus)
+- Create VCI signal bundles for each component
+- Connect components to the bus via the VCI signals (netlist)
+*/
+
 // Base address and size of the GCD memory-mapped peripheral
-#define GCD0_BASE 0x10000000
-#define GCD1_BASE 0x20000000
-#define GCD2_BASE 0x30000000
-// Every master has the same size, so we only need to define it one time
-// 4 registers of 4 bytes each = 16 bytes or 0x10
+// MSB should be different for each peripheral so that the bus can decode the address of the target
+#define GCD0_BASE 0x00000000
+#define GCD1_BASE 0x10000000
+#define GCD2_BASE 0x20000000
+
+// The GCD component contains 4 registers of 4 bytes each = 16 bytes or 0x10
 #define GCD_SIZE (1 << 4)
 
 int sc_main(int argc, char* argv[])
@@ -50,6 +60,7 @@ int sc_main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
+    // We are using only 1 level of indexing for both initiators and targets
     MappingTable maptab(32, IntTab(8), IntTab(8), 0x03000000);
     maptab.add(soclib::common::Segment("GCD0", GCD0_BASE, GCD_SIZE, IntTab(0), true));
     maptab.add(soclib::common::Segment("GCD1", GCD1_BASE, GCD_SIZE, IntTab(1), true));
