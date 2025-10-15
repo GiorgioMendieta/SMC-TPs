@@ -4,10 +4,10 @@ CFLAGS=-Wno-deprecated -fpermissive
 # Uncomment the following lines depending on your setup
 
 # SESI paths
-# SYSTEMCINC=/users/outil/dsx/cctools/include -m32 -c
-# SYSTEMCLIB=/users/outil/dsx/cctools/lib-linux -m32 -c
-# SYSCASSINC=/users/outil/dsx/systemcass/include -m32 -c
-# SYSCASSLIB=/users/outil/dsx/systemcass/lib-linux -m32 -c
+# SYSTEMCINC=/users/outil/dsx/cctools/include      -m32
+# SYSTEMCLIB=/users/outil/dsx/cctools/lib-linux    -m32
+# SYSCASSINC=/users/outil/dsx/systemcass/include   -m32
+# SYSCASSLIB=/users/outil/dsx/systemcass/lib-linux -m32
 
 # Giorgio's paths for Mac with Apple Silicon
 SYSTEMCINC=/opt/homebrew/Cellar/systemc/3.0.1/include
@@ -18,8 +18,8 @@ SYSCASSLIB=/usr/local/lib-macosx
 # Wilfrid's paths for Linux with Intel
 # SYSTEMCINC=/home/wilfrid/systemc-2.3.3/include
 # SYSTEMCLIB=/home/wilfrid/systemc-2.3.3/lib-linux64
-# SYSTEMCASSINC=/usr/local/includew
-# SYSTEMCASSLIB=/usr/local/lib-linux/
+# SYSCASSINC=/usr/local/include
+# SYSCASSLIB=/usr/local/lib-linux/
 
 CTOOLS=-std=gnu++17 -I. -I $(SYSTEMCINC) -c
 FASTTOOLS=-std=gnu++17 -I. -I $(SYSCASSINC) -c
@@ -60,7 +60,8 @@ simple_simulator.x : address_decoding_table.o address_masking_table.o mapping_ta
 
 multi_simulator.x : address_decoding_table.o address_masking_table.o mapping_table.o segment.o vci_vgsb.o vci_gcd_master.o vci_gcd_coprocessor.o tp2_multi_top.o 
 	$(CC) $(CFLAGS) -L. -L$(SYSTEMCLIB) -o multi_simulator.x address_decoding_table.o address_masking_table.o mapping_table.o segment.o vci_vgsb.o vci_gcd_master.o vci_gcd_coprocessor.o tp2_multi_top.o -lsystemc 2>&1
+
 clean :
-	rm -f *.o 
+	rm -f ./bin/*.o 
 	rm -f *.x
 	
