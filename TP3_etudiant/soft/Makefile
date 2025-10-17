@@ -1,22 +1,22 @@
-LD= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-ld
-CC= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-gcc
-AS= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-as
-DU= /opt/gcc-cross-mipsel/4.3.3/bin/mipsel-unknown-elf-objdump
+LD= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-ld		# Editeur de lien
+CC= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-gcc		# compilateur
+AS= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-as		# Assembleur
+DU= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-objdump	# Déssassembleur
 
-SYS_OBJS=  reset.o \
-	   giet.o \
-	   drivers.o \
-	   common.o \
-           ctx_handler.o \
-           sys_handler.o \
-           irq_handler.o \
-           exc_handler.o 
+SYS_OBJS=  	reset.o \
+	   		giet.o \
+	   		drivers.o \
+	   		common.o \
+           	ctx_handler.o \
+           	sys_handler.o \
+           	irq_handler.o \
+           	exc_handler.o 
 
-APP_OBJS=  stdio.o \
-	   main.o 
+APP_OBJS= 	stdio.o \
+	   		main.o 
 
-GIET_SYS_PATH= giet_2011/sys
-GIET_APP_PATH= giet_2011/app
+GIET_SYS_PATH= ../../giet_2011/sys
+GIET_APP_PATH= ../../giet_2011/app
 
 CFLAGS= -Wall -mno-gpopt -ffreestanding -mips32 
 
@@ -26,53 +26,53 @@ all: sys.bin app.bin
 
 sys.bin: $(SYS_OBJS) sys.ld seg.ld
 	$(LD) -o $@ -T sys.ld $(SYS_OBJS)
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 giet.o: $(GIET_SYS_PATH)/giet.s
 	$(AS) -g -mips32 -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 reset.o: reset.s
 	$(AS) -g -mips32 -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 drivers.o: $(GIET_SYS_PATH)/drivers.c $(GIET_SYS_PATH)/drivers.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 common.o: $(GIET_SYS_PATH)/common.c $(GIET_SYS_PATH)/common.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 ctx_handler.o: $(GIET_SYS_PATH)/ctx_handler.c $(GIET_SYS_PATH)/ctx_handler.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 sys_handler.o: $(GIET_SYS_PATH)/sys_handler.c $(GIET_SYS_PATH)/sys_handler.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 irq_handler.o: $(GIET_SYS_PATH)/irq_handler.c $(GIET_SYS_PATH)/irq_handler.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 exc_handler.o: $(GIET_SYS_PATH)/exc_handler.c $(GIET_SYS_PATH)/exc_handler.h
 	$(CC) $(CFLAGS) -I$(GIET_SYS_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 ## application compilation  
 
 app.bin: $(APP_OBJS) app.ld seg.ld
 	$(LD) -o $@ -T app.ld $(APP_OBJS)
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 stdio.o: $(GIET_APP_PATH)/stdio.c $(GIET_APP_PATH)/stdio.h
 	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 main.o: main.c
 	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
-	$(DU) -D $@ > $@.txt
+	$(DU) -D $@ > ./Dissassembly/$@.txt
 
 clean:
-	rm -f *.o *.bin *.txt core *~
+	rm -f *.o *.bin ./Dissassembly/*.txt core *~
