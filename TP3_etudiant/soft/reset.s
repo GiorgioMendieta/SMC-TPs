@@ -19,25 +19,25 @@
 	.align	2
 
 reset:
-       	.set noreorder
+    .set noreorder
 
 # initializes stack pointer
 	la	$27,	seg_stack_base
-        li	TO BE COMPLETED		# $26 <= 64K
-	addu	TO BE COMPLETED		# $29 <= seg_stack_base + 64K
+    li	/* TODO: */		# $26 <= 64K
+	addu	/* TODO: */		# $29 <= seg_stack_base + 64K
 
 # initializes EPC register   
 	la	$26,	main		# $26 <= address main
 	mtc0	$26,	$14		# EPC <= main
 
 # initializes SR register
-       	li	$26,	0x0000FF13		
-       	mtc0	$26,	$12		# SR <= user mode / IRQ enable (after eret)
+    li	$26,	0x0000FF13		
+    mtc0	$26,	$12		# SR <= user mode / IRQ enable (after eret)
 
 # jumps to main 
-        la      TO BE COMPLETED         # $26 <= seg_data_base
-        lw      TO BE COMPLETED         # $26 <= M[seg_data_base]
-        mtc0    TO BE COMPLETED         # EPC <= $26  (EPC == $14)
+    la      /* TODO: */         # $26 <= seg_data_base
+    lw      /* TODO: */         # $26 <= M[seg_data_base]
+    mtc0    /* TODO: */         # EPC <= $26  (EPC == $14)
 	eret
 
 	.end	reset
