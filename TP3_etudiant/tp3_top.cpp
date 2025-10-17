@@ -46,32 +46,32 @@
 #include "vci_vgsb.h"
 #include "vci_xcache_wrapper.h"
 
-#define SEG_RESET_BASE /* TODO: */
-#define SEG_RESET_SIZE /* TODO: */
+#define SEG_RESET_BASE 0xBFC00000
+#define SEG_RESET_SIZE 4000
 
-#define SEG_KCODE_BASE /* TODO: */
-#define SEG_KCODE_SIZE /* TODO: */
+#define SEG_KCODE_BASE 0x80000000
+#define SEG_KCODE_SIZE 64000
 
-#define SEG_KDATA_BASE /* TODO: */
-#define SEG_KDATA_SIZE /* TODO: */
+#define SEG_KDATA_BASE 0x81000000
+#define SEG_KDATA_SIZE 64000
 
-#define SEG_KUNC_BASE /* TODO: */
-#define SEG_KUNC_SIZE /* TODO: */
+#define SEG_KUNC_BASE 0x82000000
+#define SEG_KUNC_SIZE 64000
 
-#define SEG_DATA_BASE /* TODO: */
-#define SEG_DATA_SIZE /* TODO: */
+#define SEG_DATA_BASE 0x01000000
+#define SEG_DATA_SIZE 64000
 
-#define SEG_CODE_BASE /* TODO: */
-#define SEG_CODE_SIZE /* TODO: */
+#define SEG_CODE_BASE 0x00400000
+#define SEG_CODE_SIZE 64000 // 0x10000
 
-#define SEG_STACK_BASE /* TODO: */
-#define SEG_STACK_SIZE /* TODO: */
+#define SEG_STACK_BASE 0x02000000
+#define SEG_STACK_SIZE 64000
 
-#define SEG_TTY_BASE /* TODO: */
-#define SEG_TTY_SIZE /* TODO: */
+#define SEG_TTY_BASE 0x90000000
+#define SEG_TTY_SIZE 64
 
-#define SEG_GCD_BASE /* TODO: */
-#define SEG_GCD_SIZE /* TODO: */
+#define SEG_GCD_BASE 0x95000000
+#define SEG_GCD_SIZE 16
 
 // TGTID definition
 #define TGTID_ROM 0
