@@ -27,8 +27,8 @@ reset:
 	addu	$29, $27, $26		# $29 <= seg_stack_base + 64K
 
 # initializes EPC register   
-	la	    $26,	main		# $26 <= address main
-	mtc0	$26,	$14		# EPC <= main
+	# la	    $26,	main		# $26 <= address main
+	# mtc0	$26,	$14		# EPC <= main
 
 # initializes SR register
     li	    $26,	0x0000FF13		

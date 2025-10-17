@@ -47,32 +47,32 @@
 #include "vci_xcache_wrapper.h"
 
 #define SEG_RESET_BASE 0xBFC00000
-#define SEG_RESET_SIZE 4000
+#define SEG_RESET_SIZE 0xFA0 // 4000 //1111 1010 0000
 
 #define SEG_KCODE_BASE 0x80000000
-#define SEG_KCODE_SIZE 64000
+#define SEG_KCODE_SIZE 0x10000
 
 #define SEG_KDATA_BASE 0x81000000
-#define SEG_KDATA_SIZE 64000
+#define SEG_KDATA_SIZE 0x10000
 
 #define SEG_KUNC_BASE 0x82000000
-#define SEG_KUNC_SIZE 64000
+#define SEG_KUNC_SIZE 0x10000 // 64Ko = 65536 o
 
 #define SEG_DATA_BASE 0x01000000
-#define SEG_DATA_SIZE 64000
+#define SEG_DATA_SIZE 0x10000
 
 #define SEG_CODE_BASE 0x00400000
-#define SEG_CODE_SIZE 64000 // 0x10000
+#define SEG_CODE_SIZE 0x10000
 
 #define SEG_STACK_BASE 0x02000000
-#define SEG_STACK_SIZE 64000
+#define SEG_STACK_SIZE 0x10000
 
 #define SEG_TTY_BASE 0x90000000
-#define SEG_TTY_SIZE 64
+#define SEG_TTY_SIZE 0x40 // 64
 
 #define SEG_GCD_BASE 0x95000000
-#define SEG_GCD_SIZE 16
-
+#define SEG_GCD_SIZE 0x10 // 16
+100 0000 0100
 // TGTID definition
 #define TGTID_ROM 0
 #define TGTID_RAM 1
@@ -99,7 +99,7 @@
 #define dcache_sets  128
 #define dcache_words 8
 
-int _main(int argc, char* argv[])
+    int _main(int argc, char* argv[])
 {
     using namespace sc_core;
     using namespace soclib::caba;
@@ -157,17 +157,15 @@ int _main(int argc, char* argv[])
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
     MappingTable maptab(/* TODO: */);
-
-    maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), /* TODO: */));
-
-    maptab.add(Segment("seg_kcode", SEG_KCODE_BASE, SEG_KCODE_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-    maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-    maptab.add(Segment("seg_kunc", SEG_KUNC_BASE, SEG_KUNC_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-    maptab.add(Segment("seg_code", SEG_CODE_BASE, SEG_CODE_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-    maptab.add(Segment("seg_data", SEG_DATA_BASE, SEG_DATA_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-    maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), /* TODO: */));
-
-    maptab.add(Segment("seg_tty", SEG_TTY_BASE, SEG_TTY_SIZE, IntTab(TGTID_TTY), /* TODO: */));
+    // MappingTable maptab(32, IntTab(8), IntTab(8), 0x03000000);
+    maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), true));
+    maptab.add(Segment("seg_kcode", SEG_KCODE_BASE, SEG_KCODE_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_kunc", SEG_KUNC_BASE, SEG_KUNC_SIZE, IntTab(TGTID_RAM), false));
+    maptab.add(Segment("seg_code", SEG_CODE_BASE, SEG_CODE_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_data", SEG_DATA_BASE, SEG_DATA_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_tty", SEG_TTY_BASE, SEG_TTY_SIZE, IntTab(TGTID_TTY), false));
 
     maptab.add(Segment("seg_gcd", SEG_GCD_BASE, SEG_GCD_SIZE, IntTab(TGTID_GCD), /* TODO: */));
 
