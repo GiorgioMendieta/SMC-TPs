@@ -15,8 +15,8 @@ SYS_OBJS=  reset.o \
 APP_OBJS=  stdio.o \
 	   main.o 
 
-GIET_SYS_PATH= /users/enseig/alain/giet_2011/sys
-GIET_APP_PATH= /users/enseig/alain/giet_2011/app
+GIET_SYS_PATH= giet_2011/sys
+GIET_APP_PATH= giet_2011/app
 
 CFLAGS= -Wall -mno-gpopt -ffreestanding -mips32 
 
