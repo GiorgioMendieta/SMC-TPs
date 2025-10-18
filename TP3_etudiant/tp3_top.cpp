@@ -47,7 +47,7 @@
 #include "vci_xcache_wrapper.h"
 
 #define SEG_RESET_BASE 0xBFC00000
-#define SEG_RESET_SIZE 0xFA0 // 4000 //1111 1010 0000
+#define SEG_RESET_SIZE 0x1000 // 4 Ko = 4096 o
 
 #define SEG_KCODE_BASE 0x80000000
 #define SEG_KCODE_SIZE 0x10000
@@ -56,7 +56,7 @@
 #define SEG_KDATA_SIZE 0x10000
 
 #define SEG_KUNC_BASE 0x82000000
-#define SEG_KUNC_SIZE 0x10000 // 64Ko = 65536 o
+#define SEG_KUNC_SIZE 0x10000 // 64 Ko = 65536 o
 
 #define SEG_DATA_BASE 0x01000000
 #define SEG_DATA_SIZE 0x10000
@@ -68,11 +68,11 @@
 #define SEG_STACK_SIZE 0x10000
 
 #define SEG_TTY_BASE 0x90000000
-#define SEG_TTY_SIZE 0x40 // 64
+#define SEG_TTY_SIZE 0x40 // 64 o
 
 #define SEG_GCD_BASE 0x95000000
-#define SEG_GCD_SIZE 0x10 // 16
-100 0000 0100
+#define SEG_GCD_SIZE 0x10 // 16 o
+
 // TGTID definition
 #define TGTID_ROM 0
 #define TGTID_RAM 1
@@ -99,7 +99,7 @@
 #define dcache_sets  128
 #define dcache_words 8
 
-    int _main(int argc, char* argv[])
+int _main(int argc, char* argv[])
 {
     using namespace sc_core;
     using namespace soclib::caba;
