@@ -27,7 +27,7 @@ reset:
     addu    $29,    $27,            $26 # $29 <= seg_stack_base + 64K
 
     # initializes EPC register
-    la      $26,    seg_data_base	# $26 <= address main
+    la      $26,    seg_data_base       # $26 <= address main
     mtc0    $26,    $14                 # EPC <= main
 
     # initializes SR register
@@ -36,7 +36,7 @@ reset:
 
     # jumps to main
     la      $26,    seg_data_base       # $26 <= seg_data_base
-    lw      $26,    0($26)              # $26 <= M[seg_data_base] NOT SURE
+    lw      $26,    0($26)              # $26 <= M[seg_data_base]
     mtc0    $26,    $14                 # EPC <= $26  (EPC == $14)
     eret
 

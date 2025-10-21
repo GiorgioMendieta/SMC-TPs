@@ -46,32 +46,34 @@
 #include "vci_vgsb.h"
 #include "vci_xcache_wrapper.h"
 
+// System segments
 #define SEG_RESET_BASE 0xBFC00000
 #define SEG_RESET_SIZE 0x1000 // 4 Ko = 4096 o
 
-#define SEG_KCODE_BASE 0x80000000
-#define SEG_KCODE_SIZE 0x10000
-
-#define SEG_KDATA_BASE 0x81000000
-#define SEG_KDATA_SIZE 0x10000
-
-#define SEG_KUNC_BASE 0x82000000
-#define SEG_KUNC_SIZE 0x10000 // 64 Ko = 65536 o
-
-#define SEG_DATA_BASE 0x01000000
-#define SEG_DATA_SIZE 0x10000
-
-#define SEG_CODE_BASE 0x00400000
-#define SEG_CODE_SIZE 0x10000
-
-#define SEG_STACK_BASE 0x02000000
-#define SEG_STACK_SIZE 0x10000
+#define SEG_GCD_BASE 0x95000000
+#define SEG_GCD_SIZE 0x10 // 16 o
 
 #define SEG_TTY_BASE 0x90000000
 #define SEG_TTY_SIZE 0x40 // 64 o
 
-#define SEG_GCD_BASE 0x95000000
-#define SEG_GCD_SIZE 0x10 // 16 o
+#define SEG_KUNC_BASE 0x82000000
+#define SEG_KUNC_SIZE 0x10000 // 64 Ko = 65536 o
+
+#define SEG_KDATA_BASE 0x81000000
+#define SEG_KDATA_SIZE 0x10000
+
+#define SEG_KCODE_BASE 0x80000000
+#define SEG_KCODE_SIZE 0x10000
+
+// User segments
+#define SEG_CODE_BASE 0x00400000
+#define SEG_CODE_SIZE 0x10000
+
+#define SEG_DATA_BASE 0x01000000
+#define SEG_DATA_SIZE 0x10000
+
+#define SEG_STACK_BASE 0x02000000
+#define SEG_STACK_SIZE 0x10000
 
 // TGTID definition
 #define TGTID_ROM 0
