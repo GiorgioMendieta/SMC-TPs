@@ -158,18 +158,22 @@ int _main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////
     // Mapping Table
     //////////////////////////////////////////////////////////////////////////
-    MappingTable maptab(/* TODO: */);
-    // MappingTable maptab(32, IntTab(8), IntTab(8), 0x03000000);
+
+    // TODO: complete the mapping table definition
+    MappingTable maptab(32, IntTab(6), IntTab(0), 0xFF000000);
+    // MappingTable maptab(32, IntTab(6), IntTab(0), 0xFF000000);
     maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), true));
+
     maptab.add(Segment("seg_kcode", SEG_KCODE_BASE, SEG_KCODE_SIZE, IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_kunc", SEG_KUNC_BASE, SEG_KUNC_SIZE, IntTab(TGTID_RAM), false));
     maptab.add(Segment("seg_code", SEG_CODE_BASE, SEG_CODE_SIZE, IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_data", SEG_DATA_BASE, SEG_DATA_SIZE, IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), true));
+
     maptab.add(Segment("seg_tty", SEG_TTY_BASE, SEG_TTY_SIZE, IntTab(TGTID_TTY), false));
 
-    maptab.add(Segment("seg_gcd", SEG_GCD_BASE, SEG_GCD_SIZE, IntTab(TGTID_GCD), /* TODO: */));
+    maptab.add(Segment("seg_gcd", SEG_GCD_BASE, SEG_GCD_SIZE, IntTab(TGTID_GCD), false));
 
     std::cout << std::endl << maptab << std::endl;
 
@@ -190,24 +194,26 @@ int _main(int argc, char* argv[])
     // Components
     //////////////////////////////////////////////////////////////////////////
 
-    Loader loader(/* TODO: */);
+    Loader loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, Mips32ElIss>* proc proc = new VciXcacheWrapper<vci_param, Mips32ElIss>(/* TODO: */);
+    VciXcacheWrapper<vci_param, Mips32ElIss>* proc;
+    proc = new VciXcacheWrapper<vci_param, Mips32ElIss>("mips32", 0, maptab, IntTab(0), icache_ways, icache_sets,
+                                                        icache_words, dcache_ways, dcache_sets, dcache_words);
 
     VciSimpleRam<vci_param>* rom;
-    rom = new VciSimpleRam<vci_param>(/* TODO: */);
+    rom = new VciSimpleRam<vci_param>("rom", IntTab(TGTID_ROM), maptab);
 
     VciSimpleRam<vci_param>* ram;
-    ram = new VciSimpleRam<vci_param>(/* TODO: */);
+    ram = new VciSimpleRam<vci_param>("ram", IntTab(TGTID_RAM), maptab);
 
     VciMultiTty<vci_param>* tty;
-    tty = new VciMultiTty<vci_param>(/* TODO: */);
+    tty = new VciMultiTty<vci_param>("tty", IntTab(TGTID_TTY), maptab, "tty0", NULL);
 
     VciGcdCoprocessor<vci_param>* gcd;
-    gcd = new VciGcdCoprocessor<vci_param>(/* TODO: */);
+    gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(/* TODO: */);
+    bus = new VciVgsb<vci_param>("bus", maptab, 1, 4); // 1 initiator, 4 targets
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
@@ -241,11 +247,11 @@ int _main(int argc, char* argv[])
 
     bus->p_clk(signal_clk);
     bus->p_resetn(signal_resetn);
-    /* TODO: */
-    /* TODO: */
-    /* TODO: */
-    /* TODO: */
-    /* TODO: */
+    bus->p_to_initiator[0](signal_vci_proc);
+    bus->p_to_target[0](signal_vci_rom);
+    bus->p_to_target[1](signal_vci_ram);
+    bus->p_to_target[2](signal_vci_tty);
+    bus->p_to_target[3](signal_vci_gcd);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
