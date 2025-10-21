@@ -5,25 +5,90 @@ main.o:     file format elf32-littlemips
 Disassembly of section .text:
 
 00000000 <main>:
-   0:	27bdffe0 	addiu	sp,sp,-32
-   4:	afbf001c 	sw	ra,28(sp)
-   8:	afbe0018 	sw	s8,24(sp)
+   0:	27bdffd0 	addiu	sp,sp,-48
+   4:	afbf002c 	sw	ra,44(sp)
+   8:	afbe0028 	sw	s8,40(sp)
    c:	03a0f025 	move	s8,sp
-  10:	3c020000 	lui	v0,0x0
-  14:	24440000 	addiu	a0,v0,0
-  18:	0c000000 	jal	0 <main>
-  1c:	00000000 	nop
-  20:	27c20010 	addiu	v0,s8,16
-  24:	00402025 	move	a0,v0
-  28:	0c000000 	jal	0 <main>
-  2c:	00000000 	nop
-  30:	1000fff7 	b	10 <main+0x10>
+  10:	afc00010 	sw	zero,16(s8)
+  14:	8fc20010 	lw	v0,16(s8)
+  18:	24420001 	addiu	v0,v0,1
+  1c:	afc20010 	sw	v0,16(s8)
+  20:	0c000000 	jal	0 <main>
+  24:	00000000 	nop
+  28:	24420001 	addiu	v0,v0,1
+  2c:	afc20014 	sw	v0,20(s8)
+  30:	0c000000 	jal	0 <main>
   34:	00000000 	nop
+  38:	24420001 	addiu	v0,v0,1
+  3c:	afc20018 	sw	v0,24(s8)
+  40:	8fc40014 	lw	a0,20(s8)
+  44:	0c000000 	jal	0 <main>
+  48:	00000000 	nop
+  4c:	8fc40018 	lw	a0,24(s8)
+  50:	0c000000 	jal	0 <main>
+  54:	00000000 	nop
+  58:	0c000000 	jal	0 <main>
+  5c:	00000000 	nop
+  60:	10400005 	beqz	v0,78 <main+0x78>
+  64:	00000000 	nop
+  68:	3c020000 	lui	v0,0x0
+  6c:	24440000 	addiu	a0,v0,0
+  70:	0c000000 	jal	0 <main>
+  74:	00000000 	nop
+  78:	00000000 	nop
+  7c:	27c20020 	addiu	v0,s8,32
+  80:	00402025 	move	a0,v0
+  84:	0c000000 	jal	0 <main>
+  88:	00000000 	nop
+  8c:	1440fffb 	bnez	v0,7c <main+0x7c>
+  90:	00000000 	nop
+  94:	27c20024 	addiu	v0,s8,36
+  98:	00402025 	move	a0,v0
+  9c:	0c000000 	jal	0 <main>
+  a0:	00000000 	nop
+  a4:	3c020000 	lui	v0,0x0
+  a8:	2444000c 	addiu	a0,v0,12
+  ac:	0c000000 	jal	0 <main>
+  b0:	00000000 	nop
+  b4:	0c000000 	jal	0 <main>
+  b8:	00000000 	nop
+  bc:	00402825 	move	a1,v0
+  c0:	3c020000 	lui	v0,0x0
+  c4:	24440024 	addiu	a0,v0,36
+  c8:	0c000000 	jal	0 <main>
+  cc:	00000000 	nop
+  d0:	8fc50010 	lw	a1,16(s8)
+  d4:	3c020000 	lui	v0,0x0
+  d8:	24440030 	addiu	a0,v0,48
+  dc:	0c000000 	jal	0 <main>
+  e0:	00000000 	nop
+  e4:	8fc50014 	lw	a1,20(s8)
+  e8:	3c020000 	lui	v0,0x0
+  ec:	24440040 	addiu	a0,v0,64
+  f0:	0c000000 	jal	0 <main>
+  f4:	00000000 	nop
+  f8:	8fc50018 	lw	a1,24(s8)
+  fc:	3c020000 	lui	v0,0x0
+ 100:	24440050 	addiu	a0,v0,80
+ 104:	0c000000 	jal	0 <main>
+ 108:	00000000 	nop
+ 10c:	8fc20024 	lw	v0,36(s8)
+ 110:	00402825 	move	a1,v0
+ 114:	3c020000 	lui	v0,0x0
+ 118:	24440060 	addiu	a0,v0,96
+ 11c:	0c000000 	jal	0 <main>
+ 120:	00000000 	nop
+ 124:	27c2001c 	addiu	v0,s8,28
+ 128:	00402025 	move	a0,v0
+ 12c:	0c000000 	jal	0 <main>
+ 130:	00000000 	nop
+ 134:	1000ffb7 	b	14 <main+0x14>
+ 138:	00000000 	nop
 
 Disassembly of section .reginfo:
 
 00000000 <.reginfo>:
-   0:	e0000014 	sc	zero,20(zero)
+   0:	e0000034 	sc	zero,52(zero)
 	...
 
 Disassembly of section .MIPS.abiflags:
@@ -42,17 +107,42 @@ Disassembly of section .pdr:
    4:	c0000000 	ll	zero,0(zero)
    8:	fffffffc 	sdc3	$31,-4(ra)
 	...
-  14:	00000020 	add	zero,zero,zero
+  14:	00000030 	tge	zero,zero
   18:	0000001e 	0x1e
   1c:	0000001f 	0x1f
 
 Disassembly of section .rodata:
 
 00000000 <.rodata>:
-   0:	6c65680a 	0x6c65680a
-   4:	77206f6c 	jalx	c81bdb0 <main+0xc81bdb0>
-   8:	646c726f 	0x646c726f
-   c:	Address 0x000000000000000c is out of bounds.
+   0:	20444347 	addi	a0,v0,17223
+   4:	6f727245 	0x6f727245
+   8:	00000a72 	tlt	zero,zero,0x29
+   c:	2d2d2d2d 	sltiu	t5,t1,11565
+  10:	2d2d2d2d 	sltiu	t5,t1,11565
+  14:	2d2d2d2d 	sltiu	t5,t1,11565
+  18:	2d2d2d2d 	sltiu	t5,t1,11565
+  1c:	2d2d2d2d 	sltiu	t5,t1,11565
+  20:	0000000a 	movz	zero,zero,zero
+  24:	6c637963 	0x6c637963
+  28:	25203a65 	addiu	zero,t1,14949
+  2c:	00000a64 	0xa64
+  30:	72657469 	0x72657469
+  34:	6f697461 	0x6f697461
+  38:	25203a6e 	addiu	zero,t1,14958
+  3c:	00000a64 	0xa64
+  40:	7265706f 	0x7265706f
+  44:	20646e61 	addi	a0,v1,28257
+  48:	25203a61 	addiu	zero,t1,14945
+  4c:	00000a75 	0xa75
+  50:	7265706f 	0x7265706f
+  54:	20646e61 	addi	a0,v1,28257
+  58:	25203a62 	addiu	zero,t1,14946
+  5c:	00000a75 	0xa75
+  60:	20444347 	addi	a0,v0,17223
+  64:	75736572 	jalx	5cd95c8 <main+0x5cd95c8>
+  68:	203a746c 	addi	k0,at,29804
+  6c:	0a0a7525 	j	829d494 <main+0x829d494>
+  70:	Address 0x0000000000000070 is out of bounds.
 
 
 Disassembly of section .ctors:
