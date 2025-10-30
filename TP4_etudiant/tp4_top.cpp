@@ -51,6 +51,12 @@
 #include "vci_vgsb.h"
 #include "vci_xcache_wrapper.h"
 
+// Parameters
+#define NPROCS    1
+#define FB_NPIXEL 128
+#define FB_NLINE  128
+
+// Memory mapping segments definition
 #define SEG_RESET_BASE 0xBFC00000
 #define SEG_RESET_SIZE 0x00001000
 
@@ -72,26 +78,26 @@
 #define SEG_STACK_BASE 0x02000000
 #define SEG_STACK_SIZE 0x01000000
 
-#define SEG_TTY_BASE /* TODO: */
-#define SEG_TTY_SIZE /* TODO: */
+#define SEG_TTY_BASE 0x90000000
+#define SEG_TTY_SIZE 16 * NPROCS
 
-#define SEG_TIM_BASE /* TODO: */
-#define SEG_TIM_SIZE /* TODO: */
+#define SEG_TIM_BASE 0x91000000
+#define SEG_TIM_SIZE 16 * NPROCS
 
-#define SEG_IOC_BASE /* TODO: */
-#define SEG_IOC_SIZE /* TODO: */
+#define SEG_IOC_BASE 0x92000000
+#define SEG_IOC_SIZE 32 // 8 registers
 
-#define SEG_DMA_BASE /* TODO: */
-#define SEG_DMA_SIZE /* TODO: */
+#define SEG_DMA_BASE 0x93000000
+#define SEG_DMA_SIZE 32 // 5 registers + padding
 
-#define SEG_FBF_BASE /* TODO: */
-#define SEG_FBF_SIZE /* TODO: */
+#define SEG_GCD_BASE 0x95000000
+#define SEG_GCD_SIZE 16 // 4 registers
 
-#define SEG_ICU_BASE /* TODO: */
-#define SEG_ICU_SIZE /* TODO: */
+#define SEG_FBF_BASE 0x96000000
+#define SEG_FBF_SIZE (FB_NPIXEL * FB_NLINE) // 128*128 pixels = 16384 B
 
-#define SEG_GCD_BASE /* TODO: */
-#define SEG_GCD_SIZE /* TODO: */
+#define SEG_ICU_BASE 0x9F000000
+#define SEG_ICU_SIZE (32 * NPROCS) // 5 registers + padding
 
 // SRCID definition
 #define SRCID_PROC 0
