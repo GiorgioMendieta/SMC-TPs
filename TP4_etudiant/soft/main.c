@@ -2,7 +2,7 @@
 
 __attribute__((constructor)) void main()
 {
-    TO BE COMPLETED
+    /* TODO: */
 
     exit();
 } // end main

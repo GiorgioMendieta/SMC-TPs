@@ -33,129 +33,122 @@
  * Maintainers: alain
  */
 
-#include <systemc>
 #include <limits>
+#include <systemc>
 
-#include "vci_signals.h"
-#include "vci_param.h"
 #include "mapping_table.h"
+#include "mips32.h"
+#include "vci_block_device.h"
+#include "vci_dma.h"
+#include "vci_framebuffer.h"
+#include "vci_gcd_coprocessor.h"
+#include "vci_icu.h"
+#include "vci_multi_tty.h"
+#include "vci_param.h"
+#include "vci_signals.h"
+#include "vci_simple_ram.h"
+#include "vci_timer.h"
 #include "vci_vgsb.h"
 #include "vci_xcache_wrapper.h"
-#include "mips32.h"
-#include "vci_multi_tty.h"
-#include "vci_timer.h"
-#include "vci_icu.h"
-#include "vci_gcd_coprocessor.h"
-#include "vci_dma.h"
-#include "vci_block_device.h"
-#include "vci_framebuffer.h"
-#include "vci_simple_ram.h"
 
-#define SEG_RESET_BASE  0xBFC00000
-#define SEG_RESET_SIZE  0x00001000
+#define SEG_RESET_BASE 0xBFC00000
+#define SEG_RESET_SIZE 0x00001000
 
 #define SEG_KERNEL_BASE 0x80000000
 #define SEG_KERNEL_SIZE 0x00004000
 
-#define SEG_KUNC_BASE   0x81000000
-#define SEG_KUNC_SIZE   0x00001000
+#define SEG_KUNC_BASE 0x81000000
+#define SEG_KUNC_SIZE 0x00001000
 
-#define SEG_KDATA_BASE  0x82000000
-#define SEG_KDATA_SIZE  0x00004000
+#define SEG_KDATA_BASE 0x82000000
+#define SEG_KDATA_SIZE 0x00004000
 
-#define SEG_DATA_BASE   0x01000000
-#define SEG_DATA_SIZE   0x00004000
+#define SEG_DATA_BASE 0x01000000
+#define SEG_DATA_SIZE 0x00004000
 
-#define SEG_CODE_BASE   0x00400000
-#define SEG_CODE_SIZE   0x00004000
+#define SEG_CODE_BASE 0x00400000
+#define SEG_CODE_SIZE 0x00004000
 
-#define SEG_STACK_BASE  0x02000000
-#define SEG_STACK_SIZE  0x01000000
+#define SEG_STACK_BASE 0x02000000
+#define SEG_STACK_SIZE 0x01000000
 
-#define SEG_TTY_BASE    TO BE COMPLETED
-#define SEG_TTY_SIZE    TO BE COMPLETED
+#define SEG_TTY_BASE /* TODO: */
+#define SEG_TTY_SIZE /* TODO: */
 
-#define SEG_TIM_BASE    TO BE COMPLETED
-#define SEG_TIM_SIZE    TO BE COMPLETED
+#define SEG_TIM_BASE /* TODO: */
+#define SEG_TIM_SIZE /* TODO: */
 
-#define SEG_IOC_BASE    TO BE COMPLETED
-#define SEG_IOC_SIZE    TO BE COMPLETED
+#define SEG_IOC_BASE /* TODO: */
+#define SEG_IOC_SIZE /* TODO: */
 
-#define SEG_DMA_BASE    TO BE COMPLETED
-#define SEG_DMA_SIZE    TO BE COMPLETED
+#define SEG_DMA_BASE /* TODO: */
+#define SEG_DMA_SIZE /* TODO: */
 
-#define SEG_FBF_BASE    TO BE COMPLETED
-#define SEG_FBF_SIZE    TO BE COMPLETED
+#define SEG_FBF_BASE /* TODO: */
+#define SEG_FBF_SIZE /* TODO: */
 
-#define SEG_ICU_BASE    TO BE COMPLETED
-#define SEG_ICU_SIZE    TO BE COMPLETED
+#define SEG_ICU_BASE /* TODO: */
+#define SEG_ICU_SIZE /* TODO: */
 
-#define SEG_GCD_BASE    TO BE COMPLETED
-#define SEG_GCD_SIZE    TO BE COMPLETED
+#define SEG_GCD_BASE /* TODO: */
+#define SEG_GCD_SIZE /* TODO: */
 
 // SRCID definition
-#define SRCID_PROC      0
-#define SRCID_IOC       1
-#define SRCID_DMA       2
+#define SRCID_PROC 0
+#define SRCID_IOC  1
+#define SRCID_DMA  2
 
 // TGTID definition
-#define TGTID_ROM       0
-#define TGTID_RAM       1
-#define TGTID_TTY       2
-#define TGTID_GCD       3
-#define TGTID_TIM       4
-#define TGTID_IOC       5
-#define TGTID_DMA       6
-#define TGTID_FBF       7
-#define TGTID_ICU       8
+#define TGTID_ROM 0
+#define TGTID_RAM 1
+#define TGTID_TTY 2
+#define TGTID_GCD 3
+#define TGTID_TIM 4
+#define TGTID_IOC 5
+#define TGTID_DMA 6
+#define TGTID_FBF 7
+#define TGTID_ICU 8
 
 // VCI fields width definition
-#define cell_size       4
-#define plen_size       8
-#define addr_size       32
-#define rerror_size     1
-#define clen_size       1
-#define rflag_size      1
-#define srcid_size      12
-#define trdid_size      1
-#define pktid_size      1
-#define wrplen_size     1
+#define cell_size   4
+#define plen_size   8
+#define addr_size   32
+#define rerror_size 1
+#define clen_size   1
+#define rflag_size  1
+#define srcid_size  12
+#define trdid_size  1
+#define pktid_size  1
+#define wrplen_size 1
 
 // Cache parameters definition
-#define icache_ways     4
-#define icache_sets     128
-#define icache_words    8
-#define dcache_ways     4
-#define dcache_sets     128
-#define dcache_words    8
+#define icache_ways  4
+#define icache_sets  128
+#define icache_words 8
+#define dcache_ways  4
+#define dcache_sets  128
+#define dcache_words 8
 
-int _main(int argc, char *argv[])
+int _main(int argc, char* argv[])
 {
     using namespace sc_core;
     using namespace soclib::caba;
     using namespace soclib::common;
 
-    typedef VciParams<cell_size,
-                      plen_size,
-                      addr_size,
-                      rerror_size,
-                      clen_size,
-                      rflag_size,
-                      srcid_size,
-                      pktid_size,
-                      trdid_size,
-                      wrplen_size> vci_param;
+    typedef VciParams<cell_size, plen_size, addr_size, rerror_size, clen_size, rflag_size, srcid_size, pktid_size,
+                      trdid_size, wrplen_size>
+        vci_param;
 
     ///////////////////////////////////////////////////////////////
     // command line arguments
     ///////////////////////////////////////////////////////////////
-    int     ncycles             = 1000000000;       // simulated cycles
-    char    sys_path[256]       = "soft/sys_bin";   // pathname for system code
-    char    app_path[256]       = "soft/app_bin";   // pathname for application code
-    char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
-    size_t  fbf_size            = 128;              // number of lines = number of pixels
-    bool    debug               = false;            // debug activated
-    int     from_cycle          = 0;                // debug start cycle
+    int ncycles            = 1000000000;      // simulated cycles
+    char sys_path[256]     = "soft/sys_bin";  // pathname for system code
+    char app_path[256]     = "soft/app_bin";  // pathname for application code
+    char ioc_filename[256] = "to_be_defined"; // pathname for the ioc file
+    size_t fbf_size        = 128;             // number of lines = number of pixels
+    bool debug             = false;           // debug activated
+    int from_cycle         = 0;               // debug start cycle
 
     std::cout << std::endl << "********************************************************" << std::endl;
     std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
@@ -163,32 +156,32 @@ int _main(int argc, char *argv[])
 
     if (argc > 1)
     {
-        for( int n=1 ; n<argc ; n=n+2 )
+        for (int n = 1; n < argc; n = n + 2)
         {
-            if( (strcmp(argv[n],"-NCYCLES") == 0) && (n+1<argc) )
+            if ((strcmp(argv[n], "-NCYCLES") == 0) && (n + 1 < argc))
             {
-                ncycles = atoi(argv[n+1]);
+                ncycles = atoi(argv[n + 1]);
             }
-            else if( (strcmp(argv[n],"-DEBUG") == 0) && (n+1<argc) )
+            else if ((strcmp(argv[n], "-DEBUG") == 0) && (n + 1 < argc))
             {
-                debug = true;
-                from_cycle = atoi(argv[n+1]);
+                debug      = true;
+                from_cycle = atoi(argv[n + 1]);
             }
-            else if( (strcmp(argv[n],"-SYS") == 0) && (n+1<argc) )
+            else if ((strcmp(argv[n], "-SYS") == 0) && (n + 1 < argc))
             {
-                strcpy(sys_path, argv[n+1]) ;
+                strcpy(sys_path, argv[n + 1]);
             }
-            else if( (strcmp(argv[n],"-APP") == 0) && (n+1<argc) )
+            else if ((strcmp(argv[n], "-APP") == 0) && (n + 1 < argc))
             {
-                strcpy(app_path, argv[n+1]) ;
+                strcpy(app_path, argv[n + 1]);
             }
-            else if( (strcmp(argv[n],"-IOCFILE") == 0) && (n+1<argc) )
+            else if ((strcmp(argv[n], "-IOCFILE") == 0) && (n + 1 < argc))
             {
-                strcpy(ioc_filename, argv[n+1]) ;
+                strcpy(ioc_filename, argv[n + 1]);
             }
-            else if( (strcmp(argv[n],"-FBFSIZE") == 0) && (n+1<argc) )
+            else if ((strcmp(argv[n], "-FBFSIZE") == 0) && (n + 1 < argc))
             {
-                fbf_size = atoi(argv[n+1]) ;
+                fbf_size = atoi(argv[n + 1]);
             }
             else
             {
@@ -222,44 +215,44 @@ int _main(int argc, char *argv[])
     //////////////////////////////////////////////////////////////////////////
     MappingTable maptab(32, IntTab(8), IntTab(2), 0xFF000000);
 
-    maptab.add(Segment("seg_reset" , SEG_RESET_BASE , SEG_RESET_SIZE , IntTab(TGTID_ROM), true));
+    maptab.add(Segment("seg_reset", SEG_RESET_BASE, SEG_RESET_SIZE, IntTab(TGTID_ROM), true));
 
     maptab.add(Segment("seg_kernel", SEG_KERNEL_BASE, SEG_KERNEL_SIZE, IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_kdata" , SEG_KDATA_BASE , SEG_KDATA_SIZE , IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_kunc"  , SEG_KUNC_BASE  , SEG_KUNC_SIZE  , IntTab(TGTID_RAM), false));
-    maptab.add(Segment("seg_code"  , SEG_CODE_BASE  , SEG_CODE_SIZE  , IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_data"  , SEG_DATA_BASE  , SEG_DATA_SIZE  , IntTab(TGTID_RAM), true));
-    maptab.add(Segment("seg_stack" , SEG_STACK_BASE , SEG_STACK_SIZE , IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_kdata", SEG_KDATA_BASE, SEG_KDATA_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_kunc", SEG_KUNC_BASE, SEG_KUNC_SIZE, IntTab(TGTID_RAM), false));
+    maptab.add(Segment("seg_code", SEG_CODE_BASE, SEG_CODE_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_data", SEG_DATA_BASE, SEG_DATA_SIZE, IntTab(TGTID_RAM), true));
+    maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), true));
 
-    maptab.add(Segment("seg_tty"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_timer" , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_icu"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_dma"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_fbf"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_ioc"   , TO BE COMPLETED                                           ));
-    maptab.add(Segment("seg_gcd"   , TO BE COMPLETED                                           ));
+    maptab.add(Segment("seg_tty", /* TODO: */));
+    maptab.add(Segment("seg_timer", /* TODO: */));
+    maptab.add(Segment("seg_icu", /* TODO: */));
+    maptab.add(Segment("seg_dma", /* TODO: */));
+    maptab.add(Segment("seg_fbf", /* TODO: */));
+    maptab.add(Segment("seg_ioc", /* TODO: */));
+    maptab.add(Segment("seg_gcd", /* TODO: */));
 
     std::cout << std::endl << maptab << std::endl;
 
     //////////////////////////////////////////////////////////////////////////
     // Signals
     //////////////////////////////////////////////////////////////////////////
-    sc_clock        signal_clk("signal_clk", sc_time( 1, SC_NS ), 0.5 );
+    sc_clock signal_clk("signal_clk", sc_time(1, SC_NS), 0.5);
     sc_signal<bool> signal_resetn("signal_resetn");
 
-    VciSignals<vci_param>   signal_vci_init_proc("signal_vci_init_proc");
-    VciSignals<vci_param>   signal_vci_init_dma("signal_vci_init_dma");
-    VciSignals<vci_param>   signal_vci_init_ioc("signal_vci_init_ioc");
+    VciSignals<vci_param> signal_vci_init_proc("signal_vci_init_proc");
+    VciSignals<vci_param> signal_vci_init_dma("signal_vci_init_dma");
+    VciSignals<vci_param> signal_vci_init_ioc("signal_vci_init_ioc");
 
-    VciSignals<vci_param>   signal_vci_tgt_rom("signal_vci_tgt_rom");
-    VciSignals<vci_param>   signal_vci_tgt_ram("signal_vci_tgt_ram");
-    VciSignals<vci_param>   signal_vci_tgt_tty("signal_vci_tgt_tty");
-    VciSignals<vci_param>   signal_vci_tgt_gcd("signal_vci_tgt_gcd");
-    VciSignals<vci_param>   signal_vci_tgt_tim("signal_vci_tgt_tim");
-    VciSignals<vci_param>   signal_vci_tgt_icu("signal_vci_tgt_icu");
-    VciSignals<vci_param>   signal_vci_tgt_fbf("signal_vci_tgt_fbf");
-    VciSignals<vci_param>   signal_vci_tgt_ioc("signal_vci_tgt_ioc");
-    VciSignals<vci_param>   signal_vci_tgt_dma("signal_vci_tgt_dma");
+    VciSignals<vci_param> signal_vci_tgt_rom("signal_vci_tgt_rom");
+    VciSignals<vci_param> signal_vci_tgt_ram("signal_vci_tgt_ram");
+    VciSignals<vci_param> signal_vci_tgt_tty("signal_vci_tgt_tty");
+    VciSignals<vci_param> signal_vci_tgt_gcd("signal_vci_tgt_gcd");
+    VciSignals<vci_param> signal_vci_tgt_tim("signal_vci_tgt_tim");
+    VciSignals<vci_param> signal_vci_tgt_icu("signal_vci_tgt_icu");
+    VciSignals<vci_param> signal_vci_tgt_fbf("signal_vci_tgt_fbf");
+    VciSignals<vci_param> signal_vci_tgt_ioc("signal_vci_tgt_ioc");
+    VciSignals<vci_param> signal_vci_tgt_dma("signal_vci_tgt_dma");
 
     sc_signal<bool> signal_false("signal_false");
 
@@ -282,10 +275,9 @@ int _main(int argc, char *argv[])
 
     Loader loader(sys_path, app_path);
 
-    VciXcacheWrapper<vci_param, Mips32ElIss >* proc;
-    proc = new VciXcacheWrapper<vci_param,Mips32ElIss>("proc", 0,maptab,IntTab(SRCID_PROC),
-                                                    icache_ways, icache_sets, icache_words,
-                                                    dcache_ways, dcache_sets, dcache_words);
+    VciXcacheWrapper<vci_param, Mips32ElIss>* proc;
+    proc = new VciXcacheWrapper<vci_param, Mips32ElIss>("proc", 0, maptab, IntTab(SRCID_PROC), icache_ways, icache_sets,
+                                                        icache_words, dcache_ways, dcache_sets, dcache_words);
 
     VciSimpleRam<vci_param>* rom;
     rom = new VciSimpleRam<vci_param>("rom", IntTab(TGTID_ROM), maptab, loader);
@@ -300,110 +292,110 @@ int _main(int argc, char *argv[])
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>(TO BE COMPLETED);
+    timer = new VciTimer<vci_param>(/* TODO: */);
 
     VciIcu<vci_param>* icu;
-    icu = new VciIcu<vci_param>(TO BE COMLETED);
+    icu = new VciIcu<vci_param>(/* TODO: */);
 
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>(TO BE COMPLETED);
+    dma = new VciDma<vci_param>(/* TODO: */);
 
     VciFrameBuffer<vci_param>* fbf;
-    fbf = new VciFrameBuffer<vci_param>(TO BE COMPLETED);
+    fbf = new VciFrameBuffer<vci_param>(/* TODO: */);
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>(TO BE COMPLETED); 
+    ioc = new VciBlockDevice<vci_param>(/* TODO: */);
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(TO BE COMPLETED);
+    bus = new VciVgsb<vci_param>(/* TODO: */);
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
     //////////////////////////////////////////////////////////////////////////
-    proc->p_clk                     (signal_clk);
-    proc->p_resetn                  (signal_resetn);
-    proc->p_vci                     (signal_vci_init_proc);
-    proc->p_irq[0]                  (signal_irq_proc);
-    proc->p_irq[1]                  (signal_false);
-    proc->p_irq[2]                  (signal_false);
-    proc->p_irq[3]                  (signal_false);
-    proc->p_irq[4]                  (signal_false);
-    proc->p_irq[5]                  (signal_false);
+    proc->p_clk(signal_clk);
+    proc->p_resetn(signal_resetn);
+    proc->p_vci(signal_vci_init_proc);
+    proc->p_irq[0](signal_irq_proc);
+    proc->p_irq[1](signal_false);
+    proc->p_irq[2](signal_false);
+    proc->p_irq[3](signal_false);
+    proc->p_irq[4](signal_false);
+    proc->p_irq[5](signal_false);
 
-    rom->p_clk                      (signal_clk);
-    rom->p_resetn                   (signal_resetn);
-    rom->p_vci                      (signal_vci_tgt_rom);
+    rom->p_clk(signal_clk);
+    rom->p_resetn(signal_resetn);
+    rom->p_vci(signal_vci_tgt_rom);
 
-    ram->p_clk                      (signal_clk);
-    ram->p_resetn                   (signal_resetn);
-    ram->p_vci                      (signal_vci_tgt_ram);
+    ram->p_clk(signal_clk);
+    ram->p_resetn(signal_resetn);
+    ram->p_vci(signal_vci_tgt_ram);
 
-    gcd->p_clk                      (signal_clk);
-    gcd->p_resetn                   (signal_resetn);
-    gcd->p_vci                      (signal_vci_tgt_gcd);
+    gcd->p_clk(signal_clk);
+    gcd->p_resetn(signal_resetn);
+    gcd->p_vci(signal_vci_tgt_gcd);
 
-    tty->p_clk                      (signal_clk);
-    tty->p_resetn                   (signal_resetn);
-    tty->p_vci                      (signal_vci_tgt_tty);
-    tty->p_irq[0]                   (signal_irq_tty);
+    tty->p_clk(signal_clk);
+    tty->p_resetn(signal_resetn);
+    tty->p_vci(signal_vci_tgt_tty);
+    tty->p_irq[0](signal_irq_tty);
 
-    timer->p_clk                    (signal_clk);
-    timer->p_resetn                 (signal_resetn);
-    timer->p_vci                    (signal_vci_tgt_tim);
-    timer->p_irq[0]                 (signal_irq_tim);
+    timer->p_clk(signal_clk);
+    timer->p_resetn(signal_resetn);
+    timer->p_vci(signal_vci_tgt_tim);
+    timer->p_irq[0](signal_irq_tim);
 
-    icu->p_clk                      (signal_clk);
-    icu->p_resetn                   (signal_resetn);
-    icu->p_vci                      (signal_vci_tgt_icu);
-    icu->p_irq                      (signal_irq_proc);
-    icu->p_irq_in[0]                (TO BE COMPLETED);
-    icu->p_irq_in[1]                (TO BE COMPLETED);
-    icu->p_irq_in[2]                (TO BE COMPLETED);
-    icu->p_irq_in[3]                (TO BE COMPLETED);
+    icu->p_clk(signal_clk);
+    icu->p_resetn(signal_resetn);
+    icu->p_vci(signal_vci_tgt_icu);
+    icu->p_irq(signal_irq_proc);
+    icu->p_irq_in[0](/* TODO: */);
+    icu->p_irq_in[1](/* TODO: */);
+    icu->p_irq_in[2](/* TODO: */);
+    icu->p_irq_in[3](/* TODO: */);
 
-    fbf->p_clk                      (signal_clk);
-    fbf->p_resetn                   (signal_resetn);
-    fbf->p_vci                      (signal_vci_tgt_fbf);
+    fbf->p_clk(signal_clk);
+    fbf->p_resetn(signal_resetn);
+    fbf->p_vci(signal_vci_tgt_fbf);
 
-    ioc->p_clk                      (signal_clk);
-    ioc->p_resetn                   (signal_resetn);
-    ioc->p_vci_initiator            (signal_vci_init_ioc);
-    ioc->p_vci_target               (signal_vci_tgt_ioc);
-    ioc->p_irq                      (signal_irq_ioc);
+    ioc->p_clk(signal_clk);
+    ioc->p_resetn(signal_resetn);
+    ioc->p_vci_initiator(signal_vci_init_ioc);
+    ioc->p_vci_target(signal_vci_tgt_ioc);
+    ioc->p_irq(signal_irq_ioc);
 
-    dma->p_clk                      (signal_clk);
-    dma->p_resetn                   (signal_resetn);
-    dma->p_vci_initiator            (signal_vci_init_dma);
-    dma->p_vci_target               (signal_vci_tgt_dma);
-    dma->p_irq                      (signal_irq_dma);
+    dma->p_clk(signal_clk);
+    dma->p_resetn(signal_resetn);
+    dma->p_vci_initiator(signal_vci_init_dma);
+    dma->p_vci_target(signal_vci_tgt_dma);
+    dma->p_irq(signal_irq_dma);
 
-    bus->p_clk                      (signal_clk);
-    bus->p_resetn                   (signal_resetn);
-    bus->p_to_initiator[SRCID_PROC] (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_DMA]  (TO BE COMPLETED);
-    bus->p_to_initiator[SRCID_IOC]  (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ROM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_RAM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TTY]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_GCD]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_TIM]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_ICU]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_DMA]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_FBF]     (TO BE COMPLETED);
-    bus->p_to_target[TGTID_IOC]     (TO BE COMPLETED);
+    bus->p_clk(signal_clk);
+    bus->p_resetn(signal_resetn);
+    bus->p_to_initiator[SRCID_PROC](/* TODO: */);
+    bus->p_to_initiator[SRCID_DMA](/* TODO: */);
+    bus->p_to_initiator[SRCID_IOC](/* TODO: */);
+    bus->p_to_target[TGTID_ROM](/* TODO: */);
+    bus->p_to_target[TGTID_RAM](/* TODO: */);
+    bus->p_to_target[TGTID_TTY](/* TODO: */);
+    bus->p_to_target[TGTID_GCD](/* TODO: */);
+    bus->p_to_target[TGTID_TIM](/* TODO: */);
+    bus->p_to_target[TGTID_ICU](/* TODO: */);
+    bus->p_to_target[TGTID_DMA](/* TODO: */);
+    bus->p_to_target[TGTID_FBF](/* TODO: */);
+    bus->p_to_target[TGTID_IOC](/* TODO: */);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
     //////////////////////////////////////////////////////////////////////////
 
-    signal_false = false;
+    signal_false  = false;
     signal_resetn = false;
-    sc_start( sc_time( 1, SC_NS ) ) ;
+    sc_start(sc_time(1, SC_NS));
 
     signal_resetn = true;
-    for ( int n=1 ; n<ncycles ; n++ )
+    for (int n = 1; n < ncycles; n++)
     {
-        if( debug && (n > from_cycle) )
+        if (debug && (n > from_cycle))
         {
             std::cout << "***************** cycle " << std::dec << n << std::endl;
             proc->print_trace(1);
@@ -411,28 +403,38 @@ int _main(int argc, char *argv[])
             timer->print_trace();
             rom->print_trace();
             ram->print_trace();
-            if( signal_irq_proc.read() ) std::cout << "IRQ_PROC" << std::endl;
-            if( signal_irq_tim.read() )  std::cout << "IRQ_TIM"  << std::endl;
-            if( signal_irq_tty.read() )  std::cout << "IRQ_TTY"  << std::endl;
-            if( signal_irq_ioc.read() )  std::cout << "IRQ_IOC"  << std::endl;
-            if( signal_irq_dma.read() )  std::cout << "IRQ_DMA"  << std::endl;
+            if (signal_irq_proc.read())
+                std::cout << "IRQ_PROC" << std::endl;
+            if (signal_irq_tim.read())
+                std::cout << "IRQ_TIM" << std::endl;
+            if (signal_irq_tty.read())
+                std::cout << "IRQ_TTY" << std::endl;
+            if (signal_irq_ioc.read())
+                std::cout << "IRQ_IOC" << std::endl;
+            if (signal_irq_dma.read())
+                std::cout << "IRQ_DMA" << std::endl;
         }
-        sc_start( sc_time( 1 , SC_NS ) ) ;
+        sc_start(sc_time(1, SC_NS));
     }
 
     sc_stop();
 
-    return(0);
+    return (0);
 
 } // end _main
 
-int sc_main (int argc, char *argv[])
+int sc_main(int argc, char* argv[])
 {
-    try {
+    try
+    {
         return _main(argc, argv);
-    } catch (std::exception &e) {
+    }
+    catch (std::exception& e)
+    {
         std::cout << e.what() << std::endl;
-    } catch (...) {
+    }
+    catch (...)
+    {
         std::cout << "Unknown exception occured" << std::endl;
         throw;
     }
@@ -447,4 +449,3 @@ int sc_main (int argc, char *argv[])
 // End:
 //
 // vim: filetype=cpp:expandtab:shiftwidth=4:tabstop=4:softtabstop=4
-
