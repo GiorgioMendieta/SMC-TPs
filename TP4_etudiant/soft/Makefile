@@ -74,5 +74,9 @@ main.o: main.c
 	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
 	$(DU) -D $@ > $@.txt
 
+main_display.o: main_display.c
+	$(CC) $(CFLAGS) -I$(GIET_APP_PATH) -I. -c -o $@ $<
+	$(DU) -D $@ > $@.txt
+
 clean:
 	rm -f *.o *.bin *.txt core *~
