@@ -211,7 +211,7 @@ int _main(int argc, char* argv[])
     std::cout << "    ncycles      = " << ncycles << std::endl;
     std::cout << "    sys_pathname = " << sys_path << std::endl;
     std::cout << "    app_pathname = " << app_path << std::endl;
-    std::cout << "    ioc_filename = " << soft_name << std::endl;
+    std::cout << "    ioc_filename = " << ioc_filename << std::endl;
     std::cout << "    icache_sets  = " << icache_sets << std::endl;
     std::cout << "    icache_words = " << icache_words << std::endl;
     std::cout << "    icache_ways  = " << icache_ways << std::endl;
