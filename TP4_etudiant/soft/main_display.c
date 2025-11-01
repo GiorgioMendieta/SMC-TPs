@@ -4,8 +4,9 @@ __attribute__((constructor)) void main()
 {
     unsigned char tab[128][128]; // Image buffer
     int index_block = 0;
+    int index_img   = 0;
     char c;
-    tty_puts("Bienvenue dans le main display\n");
+    tty_puts("Press a key to load an image from disk\n");
 
     while (1)
     {
@@ -21,11 +22,19 @@ __attribute__((constructor)) void main()
             {
                 tty_puts("Error during ioc transfer\n");
             }
-
             if (fb_write(0, &tab, 16384) != 0)
             {
                 tty_puts("Error during the fbf write\n");
             }
+        }
+
+        index_block += 32; // Next image
+        ++index_img;
+
+        if (index_img == 21) // Restart from the first image
+        {
+            index_block = 0;
+            index_img   = 0;
         }
     }
 
