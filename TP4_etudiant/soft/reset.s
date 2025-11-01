@@ -36,17 +36,17 @@ reset:
     la      $26,    _interrupt_vector       # interrupt vector address
     la      $27,    _isr_timer
     sw      $27,    0($26)                  # interrupt_vector[0] <= _isr_timer
-    la                                      # TODO:
-    sw                                      # TODO:              # interrupt_vector[1] <= _isr_tty_get_task0
-    la                                      # TODO:
-    sw                                      # TODO:              # interrupt_vector[2] <= _isr_ioc
-    la                                      # TODO:
-    sw                                      # TODO:              # interrupt_vector[3] <= _isr_dma
+    la      $27,    _isr_tty_get
+    sw      $27,    4($26)                  # interrupt_vector[1] <= _isr_tty_get_task0
+    la      $27,    _isr_ioc
+    sw      $27,    8($26)                  # interrupt_vector[2] <= _isr_ioc
+    la      $27,    _isr_dma
+    sw      $27,    12($26)                 # interrupt_vector[3] <= _isr_dma
 
     # initializes ICU
     la      $26,    seg_icu_base
-    li                                      # TODO:              # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
-    sw                                      # TODO:              # ICU_MASK_SET
+    li      $27,    0x0000000F              # IRQ[0] IRQ[1] IRQ[2] IRQ[3]
+    sw      $27,    8($26)                  # ICU_MASK_SET (offset 2)
 
     # initializes SR register
     li      $26,    0x0000FF13
