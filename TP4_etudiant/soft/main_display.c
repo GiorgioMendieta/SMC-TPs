@@ -6,10 +6,11 @@ __attribute__((constructor)) void main()
     int index_block = 0;
     int index_img   = 0;
     char c;
-    tty_puts("Press a key to load an image from disk\n");
+    tty_puts("Press any key to load an image from disk\n");
 
     while (1)
     {
+        tty_printf("Image Nb: %u\n", index_img);
         // Wait for a character input (blocking)
         tty_getc_irq(&c);
         if (c > 0)
