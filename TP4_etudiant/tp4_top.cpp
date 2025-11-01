@@ -97,7 +97,7 @@
 #define SEG_GCD_SIZE 16 // 4 registers
 
 #define SEG_FBF_BASE 0x96000000
-#define SEG_FBF_SIZE (FB_NPIXELS * FB_NLINES) // 128*128 pixels = 16384 B
+#define SEG_FBF_SIZE 0x400000 + (FB_NPIXELS * FB_NLINES) // 128*128 pixels = 16384 B = 0x4000
 
 #define SEG_ICU_BASE 0x9F000000
 #define SEG_ICU_SIZE (32 * NPROCS) // 5 registers + padding
@@ -152,8 +152,8 @@ int _main(int argc, char* argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int ncycles            = 1000000000;      // simulated cycles
-    char sys_path[256]     = "soft/sys_bin";  // pathname for system code
-    char app_path[256]     = "soft/app_bin";  // pathname for application code
+    char sys_path[256]     = "soft/sys.bin";  // pathname for system code
+    char app_path[256]     = "soft/app.bin";  // pathname for application code
     char ioc_filename[256] = "to_be_defined"; // pathname for the ioc file
     size_t fbf_size        = 128;             // number of lines = number of pixels
     bool debug             = false;           // debug activated
