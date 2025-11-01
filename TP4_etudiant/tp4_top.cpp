@@ -361,10 +361,11 @@ int _main(int argc, char* argv[])
     icu->p_resetn(signal_resetn);
     icu->p_vci(signal_vci_tgt_icu);
     icu->p_irq(signal_irq_proc);
-    icu->p_irq_in[0](/* TODO: */);
-    icu->p_irq_in[1](/* TODO: */);
-    icu->p_irq_in[2](/* TODO: */);
-    icu->p_irq_in[3](/* TODO: */);
+    // Connect ICU input IRQs
+    icu->p_irq_in[0](signal_irq_tim);
+    icu->p_irq_in[1](signal_irq_tty);
+    icu->p_irq_in[2](signal_irq_ioc);
+    icu->p_irq_in[3](signal_irq_dma);
 
     fbf->p_clk(signal_clk);
     fbf->p_resetn(signal_resetn);
@@ -384,18 +385,20 @@ int _main(int argc, char* argv[])
 
     bus->p_clk(signal_clk);
     bus->p_resetn(signal_resetn);
-    bus->p_to_initiator[SRCID_PROC](/* TODO: */);
-    bus->p_to_initiator[SRCID_DMA](/* TODO: */);
-    bus->p_to_initiator[SRCID_IOC](/* TODO: */);
-    bus->p_to_target[TGTID_ROM](/* TODO: */);
-    bus->p_to_target[TGTID_RAM](/* TODO: */);
-    bus->p_to_target[TGTID_TTY](/* TODO: */);
-    bus->p_to_target[TGTID_GCD](/* TODO: */);
-    bus->p_to_target[TGTID_TIM](/* TODO: */);
-    bus->p_to_target[TGTID_ICU](/* TODO: */);
-    bus->p_to_target[TGTID_DMA](/* TODO: */);
-    bus->p_to_target[TGTID_FBF](/* TODO: */);
-    bus->p_to_target[TGTID_IOC](/* TODO: */);
+    // Connect initiators
+    bus->p_to_initiator[SRCID_PROC](signal_vci_init_proc);
+    bus->p_to_initiator[SRCID_DMA](signal_vci_init_dma);
+    bus->p_to_initiator[SRCID_IOC](signal_vci_init_ioc);
+    // Connect targets
+    bus->p_to_target[TGTID_ROM](signal_vci_tgt_rom);
+    bus->p_to_target[TGTID_RAM](signal_vci_tgt_ram);
+    bus->p_to_target[TGTID_TTY](signal_vci_tgt_tty);
+    bus->p_to_target[TGTID_GCD](signal_vci_tgt_gcd);
+    bus->p_to_target[TGTID_TIM](signal_vci_tgt_tim);
+    bus->p_to_target[TGTID_ICU](signal_vci_tgt_icu);
+    bus->p_to_target[TGTID_DMA](signal_vci_tgt_dma);
+    bus->p_to_target[TGTID_FBF](signal_vci_tgt_fbf);
+    bus->p_to_target[TGTID_IOC](signal_vci_tgt_ioc);
 
     //////////////////////////////////////////////////////////////////////////
     // simulation
