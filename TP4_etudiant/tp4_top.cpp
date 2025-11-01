@@ -52,9 +52,12 @@
 #include "vci_xcache_wrapper.h"
 
 // Parameters
-#define NPROCS    1
-#define FB_NPIXEL 128
-#define FB_NLINE  128
+#define NPROCS     1
+#define MAX_TASKS  4
+#define FB_NPIXELS 128
+#define FB_NLINES  128
+#define NTTYS      NPROCS* MAX_TASKS
+#define NTIMERS    NPROCS
 
 // Memory mapping segments definition
 #define SEG_RESET_BASE 0xBFC00000
@@ -79,10 +82,10 @@
 #define SEG_STACK_SIZE 0x01000000
 
 #define SEG_TTY_BASE 0x90000000
-#define SEG_TTY_SIZE 16 * NPROCS
+#define SEG_TTY_SIZE 16 * NTTYS
 
 #define SEG_TIM_BASE 0x91000000
-#define SEG_TIM_SIZE 16 * NPROCS
+#define SEG_TIM_SIZE 16 * NTIMERS
 
 #define SEG_IOC_BASE 0x92000000
 #define SEG_IOC_SIZE 32 // 8 registers
@@ -94,7 +97,7 @@
 #define SEG_GCD_SIZE 16 // 4 registers
 
 #define SEG_FBF_BASE 0x96000000
-#define SEG_FBF_SIZE (FB_NPIXEL * FB_NLINE) // 128*128 pixels = 16384 B
+#define SEG_FBF_SIZE (FB_NPIXELS * FB_NLINES) // 128*128 pixels = 16384 B
 
 #define SEG_ICU_BASE 0x9F000000
 #define SEG_ICU_SIZE (32 * NPROCS) // 5 registers + padding
@@ -230,13 +233,14 @@ int _main(int argc, char* argv[])
     maptab.add(Segment("seg_data", SEG_DATA_BASE, SEG_DATA_SIZE, IntTab(TGTID_RAM), true));
     maptab.add(Segment("seg_stack", SEG_STACK_BASE, SEG_STACK_SIZE, IntTab(TGTID_RAM), true));
 
-    maptab.add(Segment("seg_tty", /* TODO: */));
-    maptab.add(Segment("seg_timer", /* TODO: */));
-    maptab.add(Segment("seg_icu", /* TODO: */));
-    maptab.add(Segment("seg_dma", /* TODO: */));
-    maptab.add(Segment("seg_fbf", /* TODO: */));
-    maptab.add(Segment("seg_ioc", /* TODO: */));
-    maptab.add(Segment("seg_gcd", /* TODO: */));
+    // Peripheral segments
+    maptab.add(Segment("seg_fbf", SEG_FBF_BASE, SEG_FBF_SIZE, IntTab(TGTID_FBF), false));
+    maptab.add(Segment("seg_tty", SEG_TTY_BASE, SEG_TTY_SIZE, IntTab(TGTID_TTY), false));
+    maptab.add(Segment("seg_icu", SEG_ICU_BASE, SEG_ICU_SIZE, IntTab(TGTID_ICU), false));
+    maptab.add(Segment("seg_tim", SEG_TIM_BASE, SEG_TIM_SIZE, IntTab(TGTID_TIM), false));
+    maptab.add(Segment("seg_dma", SEG_DMA_BASE, SEG_DMA_SIZE, IntTab(TGTID_DMA), false));
+    maptab.add(Segment("seg_ioc", SEG_IOC_BASE, SEG_IOC_SIZE, IntTab(TGTID_IOC), false));
+    maptab.add(Segment("seg_gcd", SEG_GCD_BASE, SEG_GCD_SIZE, IntTab(TGTID_GCD), false));
 
     std::cout << std::endl << maptab << std::endl;
 
@@ -297,23 +301,26 @@ int _main(int argc, char* argv[])
     VciGcdCoprocessor<vci_param>* gcd;
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
+    const int ntimers = 1;
     VciTimer<vci_param>* timer;
-    timer = new VciTimer<vci_param>(/* TODO: */);
+    timer = new VciTimer<vci_param>("tim", IntTab(TGTID_TIM), maptab, ntimers);
 
+    const int nirq = 4; // TIM, TTY, IOC, DMA
     VciIcu<vci_param>* icu;
-    icu = new VciIcu<vci_param>(/* TODO: */);
+    icu = new VciIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, nirq);
 
+    const int burst_size = 16;
     VciDma<vci_param>* dma;
-    dma = new VciDma<vci_param>(/* TODO: */);
+    dma = new VciDma<vci_param>("dma", maptab, IntTab(SRCID_DMA), IntTab(TGTID_DMA), burst_size);
 
     VciFrameBuffer<vci_param>* fbf;
-    fbf = new VciFrameBuffer<vci_param>(/* TODO: */);
+    fbf = new VciFrameBuffer<vci_param>("fbf", IntTab(TGTID_FBF), maptab, FB_NPIXELS, FB_NLINES);
 
     VciBlockDevice<vci_param>* ioc;
-    ioc = new VciBlockDevice<vci_param>(/* TODO: */);
+    ioc = new VciBlockDevice<vci_param>("ioc", maptab, IntTab(SRCID_IOC), IntTab(TGTID_IOC), ioc_filename);
 
     VciVgsb<vci_param>* bus;
-    bus = new VciVgsb<vci_param>(/* TODO: */);
+    bus = new VciVgsb<vci_param>("bus", maptab, 3, 9); // 3 initiators, 9 targets
 
     //////////////////////////////////////////////////////////////////////////
     // Net-List
