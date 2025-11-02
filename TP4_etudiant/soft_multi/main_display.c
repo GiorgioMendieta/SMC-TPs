@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-__attribute__((constructor)) void main()
+__attribute__((constructor)) void main_display()
 {
     unsigned char tab[128][128]; // Image buffer
     int index_block = 0;

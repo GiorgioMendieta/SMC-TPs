@@ -3,8 +3,7 @@ CC= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-gcc
 AS= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-as
 DU= /opt/gcc-cross-mipsel/8.2.0/bin/mipsel-unknown-elf-objdump
 
-SYS_OBJS=  
-	reset.o \
+SYS_OBJS=  reset.o \
 	giet.o \
 	drivers.o \
 	common.o \
@@ -13,8 +12,7 @@ SYS_OBJS=
 	irq_handler.o \
 	exc_handler.o 
 
-APP_OBJS=  
-	stdio.o \
+APP_OBJS=  stdio.o \
 	main.o \
 	main_display.o 
 
