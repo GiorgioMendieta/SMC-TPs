@@ -40,10 +40,10 @@
 #include "mapping_table.h"
 #include "mips32.h"
 #include "vci_block_device.h"
-#include "vci_dma.h"
+#include "vci_multi_dma.h"
 #include "vci_framebuffer.h"
 #include "vci_gcd_coprocessor.h"
-#include "vci_icu.h"
+#include "vci_multi_icu.h"
 #include "vci_multi_tty.h"
 #include "vci_param.h"
 #include "vci_signals.h"
@@ -159,7 +159,7 @@ int _main(int argc, char* argv[])
     size_t fbf_size        = 128;            // number of lines = number of pixels
     bool debug             = false;          // debug activated
     int from_cycle         = 0;              // debug start cycle
-    int nprocs             = 0;              // number of processors
+    unsigned nprocs             = 0;              // number of processors
 
     std::cout << std::endl << "********************************************************" << std::endl;
     std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
@@ -262,7 +262,7 @@ int _main(int argc, char* argv[])
     sc_clock signal_clk("signal_clk", sc_time(1, SC_NS), 0.5);
     sc_signal<bool> signal_resetn("signal_resetn");
 
-    VciSignals<vci_param>* signal_vci_init_proc = alloc_elems<VciSignals<vci_param>>("signal_vci_init_proc", nprocs);
+    VciSignals<vci_param>* signal_vci_init_proc = alloc_elems<VciSignals< vci_param> >("signal_vci_init_proc", nprocs);
     VciSignals<vci_param> signal_vci_init_dma("signal_vci_init_dma");
     VciSignals<vci_param> signal_vci_init_ioc("signal_vci_init_ioc");
 
@@ -278,10 +278,10 @@ int _main(int argc, char* argv[])
 
     sc_signal<bool> signal_false("signal_false");
 
-    sc_signal<bool>* signal_irq_proc = alloc_elems<sc_signal<bool>>("signal_irq_proc", nprocs);
-    sc_signal<bool>* signal_irq_tim  = alloc_elems<sc_signal<bool>>("signal_irq_tim", nprocs);
-    sc_signal<bool>* signal_irq_tty  = alloc_elems<sc_signal<bool>>("signal_irq_tty", nprocs);
-    sc_signal<bool>* signal_irq_dma  = alloc_elems<sc_signal<bool>>("signal_irq_dma", nprocs);
+    sc_signal<bool>* signal_irq_proc = alloc_elems<sc_signal<bool> >("signal_irq_proc", nprocs);
+    sc_signal<bool>* signal_irq_tim  = alloc_elems<sc_signal<bool> >("signal_irq_tim", nprocs);
+    sc_signal<bool>* signal_irq_tty  = alloc_elems<sc_signal<bool> >("signal_irq_tty", nprocs);
+    sc_signal<bool>* signal_irq_dma  = alloc_elems<sc_signal<bool> >("signal_irq_dma", nprocs);
     sc_signal<bool> signal_irq_ioc("signal_irq_ioc"); // Since IOC is shared, only one IRQ signal is needed
 
     ///////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ int _main(int argc, char* argv[])
 
     // Processor array by index
     VciXcacheWrapper<vci_param, Mips32ElIss>* proc[nprocs];
-    for (int nproc = 0; nproc < nprocs; nproc++)
+    for (unsigned nproc = 0; nproc < nprocs; nproc++)
     {
         char name[16];
         sprintf(name, "proc%d", nproc);
@@ -316,7 +316,7 @@ int _main(int argc, char* argv[])
 
     // One TTY per processor
     std::vector<std::string> tty_names(0);
-    for (int nproc = 0; nproc < nprocs; nproc++)
+    for (unsigned nproc = 0; nproc < nprocs; nproc++)
     {
         char name[16];
         sprintf(name, "tty%d", nproc);
@@ -328,11 +328,11 @@ int _main(int argc, char* argv[])
     VciGcdCoprocessor<vci_param>* gcd;
     gcd = new VciGcdCoprocessor<vci_param>("gcd", IntTab(TGTID_GCD), maptab);
 
-    const int ntimers = nprocs;
+    const unsigned ntimers = nprocs;
     VciTimer<vci_param>* timer;
     timer = new VciTimer<vci_param>("tim", IntTab(TGTID_TIM), maptab, ntimers);
 
-    const int nirq = 4 * nprocs; // TIM, TTY, IOC, DMA * 4 procs //TODO: Verify if 4*nprocs or 4*4
+    const unsigned nirq = 4 * nprocs; // TIM, TTY, IOC, DMA * 4 procs //TODO: Verify if 4*nprocs or 4*4
     VciMultiIcu<vci_param>* icu;
     icu = new VciMultiIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, nirq, nprocs);
 
@@ -353,7 +353,7 @@ int _main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////
     // Net-List
     //////////////////////////////////////////////////////////////////////////
-    for (int nproc = 0; nproc < nprocs; nproc++)
+    for (unsigned nproc = 0; nproc < nprocs; nproc++)
     {
         proc[nproc]->p_clk(signal_clk);
         proc[nproc]->p_resetn(signal_resetn);
@@ -381,33 +381,33 @@ int _main(int argc, char* argv[])
     tty->p_clk(signal_clk);
     tty->p_resetn(signal_resetn);
     tty->p_vci(signal_vci_tgt_tty);
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
         tty->p_irq[i](signal_irq_tty[i]);
 
     timer->p_clk(signal_clk);
     timer->p_resetn(signal_resetn);
     timer->p_vci(signal_vci_tgt_tim);
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
         timer->p_irq[i](signal_irq_tim[i]);
 
     icu->p_clk(signal_clk);
     icu->p_resetn(signal_resetn);
     icu->p_vci(signal_vci_tgt_icu);
     // Output IRQs
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
         icu->p_irq_out[i](signal_irq_proc[i]);
     // Input IRQs
     icu->p_irq_in[0](signal_irq_ioc);
     icu->p_irq_in[1](signal_false);
     icu->p_irq_in[2](signal_false);
     icu->p_irq_in[3](signal_false);
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
     {
         icu->p_irq_in[4 + i](signal_irq_dma[i]);
         icu->p_irq_in[8 + i](signal_irq_tim[i]);
         icu->p_irq_in[12 + i](signal_irq_tty[i]);
     }
-    for (int i = nprocs; i < NPROCS; i++)
+    for (unsigned i = nprocs; i < NPROCS; i++)
     {
         icu->p_irq_in[4 + i](signal_false);
         icu->p_irq_in[8 + i](signal_false);
@@ -428,13 +428,13 @@ int _main(int argc, char* argv[])
     dma->p_resetn(signal_resetn);
     dma->p_vci_initiator(signal_vci_init_dma);
     dma->p_vci_target(signal_vci_tgt_dma);
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
         dma->p_irq[i](signal_irq_dma[i]);
 
     bus->p_clk(signal_clk);
     bus->p_resetn(signal_resetn);
     // Connect initiators
-    for (int i = 0; i < nprocs; i++)
+    for (unsigned i = 0; i < nprocs; i++)
         bus->p_to_initiator[SRCID_PROC_BASE + i](signal_vci_init_proc[i]);
     bus->p_to_initiator[SRCID_DMA](signal_vci_init_dma);
     bus->p_to_initiator[SRCID_IOC](signal_vci_init_ioc);
