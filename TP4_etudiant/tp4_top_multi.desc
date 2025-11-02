@@ -1,15 +1,15 @@
 # -*- python -*-
 
-todo = Platform('caba', 'tp4_top.cpp',
+todo = Platform('caba', 'tp4_top_multi.cpp',
         uses = [
                 Uses('caba:vci_xcache_wrapper', iss_t = 'common:mips32el'),
                 Uses('caba:vci_vgsb'),
-                Uses('caba:vci_icu'),
+                Uses('caba:vci_multi_icu'),
                 Uses('caba:vci_gcd_coprocessor'),
                 Uses('caba:vci_timer'),
                 Uses('caba:vci_simple_ram'),
                 Uses('caba:vci_multi_tty'),
-                Uses('caba:vci_dma'),
+                Uses('caba:vci_multi_dma'),
                 Uses('caba:vci_block_device'),
                 Uses('caba:vci_framebuffer'),
                 Uses('common:elf_file_loader'),
