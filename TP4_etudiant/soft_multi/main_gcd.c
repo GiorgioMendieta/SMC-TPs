@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-__attribute__((constructor)) void main()
+__attribute__((constructor)) void main_gcd()
 {
     char byte;
     int iteration = 0;

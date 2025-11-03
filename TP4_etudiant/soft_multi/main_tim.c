@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-__attribute__((constructor)) void main()
+__attribute__((constructor)) void main_tim()
 {
     char c;
     const int TIMER_PERIOD = 250000; // Timer period in microseconds
