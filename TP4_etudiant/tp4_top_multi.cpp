@@ -153,13 +153,13 @@ int _main(int argc, char* argv[])
     // command line arguments
     ///////////////////////////////////////////////////////////////
     int ncycles            = 1000000000;     // simulated cycles
-    char sys_path[256]     = "soft/sys.bin"; // pathname for system code
-    char app_path[256]     = "soft/app.bin"; // pathname for application code
+    char sys_path[256]     = "soft_multi/sys.bin"; // pathname for system code
+    char app_path[256]     = "soft_multi/app.bin"; // pathname for application code
     char ioc_filename[256] = "images.raw";   // pathname for the ioc file
     size_t fbf_size        = 128;            // number of lines = number of pixels
     bool debug             = false;          // debug activated
     int from_cycle         = 0;              // debug start cycle
-    unsigned nprocs             = 0;              // number of processors
+    unsigned nprocs        = 1;              // number of processors
 
     std::cout << std::endl << "********************************************************" << std::endl;
     std::cout << std::endl << "******        tp4_soclib_mono                     ******" << std::endl;
@@ -332,7 +332,7 @@ int _main(int argc, char* argv[])
     VciTimer<vci_param>* timer;
     timer = new VciTimer<vci_param>("tim", IntTab(TGTID_TIM), maptab, ntimers);
 
-    const unsigned nirq = 4 * nprocs; // TIM, TTY, IOC, DMA * 4 procs //TODO: Verify if 4*nprocs or 4*4
+    const unsigned nirq = 4 * NPROCS; // TIM, TTY, IOC, DMA * 4 procs //TODO: Verify if 4*nprocs or 4*4
     VciMultiIcu<vci_param>* icu;
     icu = new VciMultiIcu<vci_param>("icu", IntTab(TGTID_ICU), maptab, nirq, nprocs);
 
@@ -407,7 +407,7 @@ int _main(int argc, char* argv[])
         icu->p_irq_in[8 + i](signal_irq_tim[i]);
         icu->p_irq_in[12 + i](signal_irq_tty[i]);
     }
-    for (unsigned i = nprocs; i < nprocs; i++)
+    for (unsigned i = nprocs; i < 4; i++)
     {
         icu->p_irq_in[4 + i](signal_false);
         icu->p_irq_in[8 + i](signal_false);
@@ -436,8 +436,8 @@ int _main(int argc, char* argv[])
     // Connect initiators
     for (unsigned i = 0; i < nprocs; i++)
         bus->p_to_initiator[SRCID_PROC_BASE + i](signal_vci_init_proc[i]);
-    bus->p_to_initiator[SRCID_DMA](signal_vci_init_dma);
-    bus->p_to_initiator[SRCID_IOC](signal_vci_init_ioc);
+    bus->p_to_initiator[nprocs](signal_vci_init_dma);
+    bus->p_to_initiator[nprocs + 1](signal_vci_init_ioc);
 
     // Connect targets
     bus->p_to_target[TGTID_ROM](signal_vci_tgt_rom);
