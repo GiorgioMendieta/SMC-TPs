@@ -407,7 +407,7 @@ int _main(int argc, char* argv[])
         icu->p_irq_in[8 + i](signal_irq_tim[i]);
         icu->p_irq_in[12 + i](signal_irq_tty[i]);
     }
-    for (unsigned i = nprocs; i < NPROCS; i++)
+    for (unsigned i = nprocs; i < nprocs; i++)
     {
         icu->p_irq_in[4 + i](signal_false);
         icu->p_irq_in[8 + i](signal_false);

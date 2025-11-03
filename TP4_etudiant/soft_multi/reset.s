@@ -149,7 +149,7 @@ proc3:
     la      $27,    _isr_tty_get_task0
     sw      $27,    60($26)                     # interrupt_vector[7] <= _isr_tty_get_task0
     la      $27,    _isr_timer
-    sw      $27,    46($26)                     # interrupt_vector[11] <= _isr_timer
+    sw      $27,    44($26)                     # interrupt_vector[11] <= _isr_timer
     la      $27,    _isr_dma
     sw      $27,    28($26)                     # interrupt_vector[15] <= _isr_dma
 
