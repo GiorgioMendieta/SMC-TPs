@@ -1,9 +1,9 @@
 
 old : tp6_top.desc tp6_top.cpp
-	soclib-cc -P -p tp6_top.desc -o simul.x
+	soclib-cc -P -p tp6_top.desc -o simulator.x
 
 advanced : tp6_top_advanced.desc tp6_top_advanced.cpp
-	soclib-cc -P -p tp6_top_advanced.desc -o simul_advanced.x -I vci_xcache_wrapper_advanced
+	soclib-cc -P -p tp6_top_advanced.desc -o simulator_advanced.x -I vci_xcache_wrapper_advanced
 
 clean:
 	rm -f *.o *.x core tmp *.deps stats trace 

@@ -88,7 +88,7 @@
 #define SEG_GCD_SIZE    0x00000014
 
 #define SEG_FBF_BASE    0x96000000
-#define SEG_FBF_SIZE    0x00004000
+#define SEG_FBF_SIZE    0x400000 + (128*128) // 0x4000
 
 #define SEG_ICU_BASE    0x9F000000
 #define SEG_ICU_SIZE    0x00000014
@@ -152,7 +152,7 @@ int _main(int argc, char *argv[])
     int     ncycles             = 1000000000;       // simulated cycles
     char    sys_path[256]       = "soft/sys.bin";   // pathname for the system code
     char    app_path[256]       = "soft/app.bin";   // pathname for the application code
-    char    ioc_filename[256]   = "to_be_defined";  // pathname for the ioc file
+    char    ioc_filename[256]   = "images.raw";     // pathname for the ioc file
     size_t  fbf_size            = 128;              // number of lines = number of pixels
     bool    debug_ok            = false;            // debug activated
     int     from_cycle          = 0;                // debug start cycle
