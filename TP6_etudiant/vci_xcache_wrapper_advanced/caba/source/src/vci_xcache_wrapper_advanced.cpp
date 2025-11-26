@@ -507,17 +507,18 @@ namespace soclib
                     dcache_cacheable = m_cacheability_table[(uint64_t)m_dreq.addr];
 
                     // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-                    dcache_hit = r_dcache.read(TO BE COMPLETED)
+                    dcache_hit =
+                        r_dcache.read(m_dreq.addr, &dcache_hit, &dcache_way, &dcache_set, &dcache_word, &dcache_rdata);
 
-                                 // Save proc request and cache response
-                                 r_dcache_addr_save = m_dreq.addr;
-                    r_dcache_type_save              = m_dreq.type;
-                    r_dcache_wdata_save             = m_dreq.wdata;
-                    r_dcache_be_save                = m_dreq.be;
-                    r_dcache_cacheable_save         = dcache_cacheable;
-                    r_dcache_way_save               = dcache_way;
-                    r_dcache_set_save               = dcache_set;
-                    r_dcache_word_save              = dcache_word;
+                    // Save proc request and cache response
+                    r_dcache_addr_save      = m_dreq.addr;
+                    r_dcache_type_save      = m_dreq.type;
+                    r_dcache_wdata_save     = m_dreq.wdata;
+                    r_dcache_be_save        = m_dreq.be;
+                    r_dcache_cacheable_save = dcache_cacheable;
+                    r_dcache_way_save       = dcache_way;
+                    r_dcache_set_save       = dcache_set;
+                    r_dcache_word_save      = dcache_word;
 
                     // compute next FSM state, VCI request, and processor response
                     if (m_dreq.type == iss_t::DATA_READ)
@@ -528,7 +529,7 @@ namespace soclib
                             m_cost_data_unc_frz++;
 
                             r_dcache_unc_req = true;
-                            r_dcache_fsm     = TO BE COMPLETED
+                            r_dcache_fsm     = DCACHE_UNC_WAIT;
                         }
                         else
                         {
@@ -538,7 +539,7 @@ namespace soclib
                             {
                                 m_drsp.valid = true;
                                 m_drsp.rdata = dcache_rdata;
-                                r_dcache_fsm = TO BE COMPLETED
+                                r_dcache_fsm = DCACHE_IDLE;
                             }
                             else // cacheable read miss
                             {
@@ -547,7 +548,7 @@ namespace soclib
 
                                 r_dcache_word_save = 0;
                                 r_dcache_miss_req  = true;
-                                r_dcache_fsm       = TO BE COMPLETED
+                                r_dcache_fsm       = DCACHE_MISS_SELECT;
                             }
                         }
                     }
@@ -559,7 +560,7 @@ namespace soclib
                             m_cost_data_unc_frz++;
 
                             r_dcache_unc_req = true;
-                            r_dcache_fsm     = TO BE COMPLETED
+                            r_dcache_fsm     = DCACHE_UNC_WAIT;
                         }
                         else
                         {
@@ -569,15 +570,14 @@ namespace soclib
                             {
                                 m_drsp.rdata = 0;
                                 m_drsp.valid = true;
-                                r_dcache_fsm = TO BE COMPLETED
+                                r_dcache_fsm = DCACHE_WRITE_REQ;
                             }
                             else // cacheable write hit
                             {
                                 m_cpt_write_cached++;
 
                                 m_drsp.rdata = 0;
-                                m_drsp.valid = true;
-                                r_dcache_fsm = TO BE COMPLETED
+                                r_dcache_fsm = DCACHE_WRITE_UPDT;
                             }
                         }
                     }
@@ -588,7 +588,7 @@ namespace soclib
                         m_cost_data_unc_frz++;
 
                         r_dcache_unc_req = true;
-                        r_dcache_fsm     = TO BE COMPLETED
+                        r_dcache_fsm     = DCACHE_UNC_WAIT;
                     }
                     else if ((m_dreq.type == iss_t::XTN_WRITE) or (m_dreq.type == iss_t::XTN_READ))
                     // only INVAL & SYNC requests are supported
@@ -623,7 +623,8 @@ namespace soclib
 
                 r_dcache.write(r_dcache_way_save.read(), r_dcache_set_save.read(), r_dcache_word_save.read(),
                                r_dcache_wdata_save.read(), r_dcache_be_save.read());
-                r_dcache_fsm = TO BE COMPLETED break;
+                r_dcache_fsm = DCACHE_WRITE_REQ;
+                break;
             }
             ////////////////////////
             case DCACHE_MISS_SELECT: // select a slot in an associative set
@@ -639,7 +640,10 @@ namespace soclib
                 r_dcache_way_save = way;
                 r_dcache_set_save = set;
                 if (valid)
-                    r_dcache_fsm = TO BE COMPLETED else r_dcache_fsm = TO BE COMPLETED break;
+                    r_dcache_fsm = DCACHE_MISS_INVAL;
+                else
+                    r_dcache_fsm = DCACHE_MISS_WAIT;
+                break;
             }
             ///////////////////////
             case DCACHE_MISS_INVAL: // invalidate the selected slot
@@ -650,7 +654,8 @@ namespace soclib
 
                 r_dcache.inval(r_dcache_way_save.read(), r_dcache_set_save.read(), &nline);
 
-                r_dcache_fsm = TO BE COMPLETED break;
+                r_dcache_fsm = DCACHE_MISS_WAIT;
+                break;
             }
             //////////////////////
             case DCACHE_MISS_WAIT: // wait a response and update the dcache
@@ -662,7 +667,7 @@ namespace soclib
                     m_drsp.valid         = true;
                     m_drsp.error         = true;
                     r_vci_rsp_data_error = false;
-                    r_dcache_fsm         = TO BE COMPLETED
+                    r_dcache_fsm         = DCACHE_IDLE;
                 }
                 else if (r_vci_rsp_fifo_data.rok()) // available data
                 {
@@ -677,7 +682,7 @@ namespace soclib
                     {
                         r_dcache.victim_update_tag(r_dcache_addr_save.read(), r_dcache_way_save.read(),
                                                    r_dcache_set_save.read());
-                        r_dcache_fsm = TO BE COMPLETED
+                        r_dcache_fsm = DCACHE_IDLE;
                     }
                 }
                 break;
@@ -692,7 +697,7 @@ namespace soclib
                     m_drsp.valid         = true;
                     m_drsp.error         = true;
                     r_vci_rsp_data_error = false;
-                    r_dcache_fsm         = TO BE COMPLETED
+                    r_dcache_fsm         = DCACHE_IDLE;
                 }
                 else if (r_vci_rsp_fifo_data.rok()) // available data
                 {
@@ -702,7 +707,7 @@ namespace soclib
                         m_drsp.valid = true;
                         m_drsp.rdata = r_vci_rsp_fifo_data.read();
                     }
-                    r_dcache_fsm = TO BE COMPLETED
+                    r_dcache_fsm = DCACHE_IDLE;
                 }
                 break;
             }
@@ -796,17 +801,17 @@ namespace soclib
             case CMD_IDLE: {
                 size_t min;
                 size_t max;
-                if (TO BE COMPLETED)
+                if (r_dcache_miss_req.read() && r_wbuf.miss(r_dcache_addr_save.read()))
                 {
                     r_vci_cmd_fsm     = CMD_DATA_MISS;
                     r_dcache_miss_req = false;
                 }
-                else if (TO BE COMPLETED)
+                else if (r_icache_miss_req.read() && r_wbuf.miss(r_icache_addr_save.read()))
                 {
                     r_vci_cmd_fsm     = CMD_INS_MISS;
                     r_icache_miss_req = false;
                 }
-                else if (TO BE COMPLETED)
+                else if (r_wbuf.rok(&min, &max))
                 {
                     r_vci_cmd_fsm = CMD_DATA_WRITE;
                     r_vci_cmd_min = min;
@@ -815,12 +820,12 @@ namespace soclib
                     m_count_write_transaction++;
                     m_length_write_transaction += (max - min + 1);
                 }
-                else if (TO BE COMPLETED)
+                else if (r_dcache_unc_req)
                 {
                     r_vci_cmd_fsm    = CMD_DATA_UNC;
                     r_dcache_unc_req = false;
                 }
-                else if (TO BE COMPLETED)
+                else if (r_icache_unc_req)
                 {
                     r_vci_cmd_fsm    = CMD_INS_UNC;
                     r_icache_unc_req = false;
@@ -835,7 +840,7 @@ namespace soclib
                     if (r_vci_cmd_cpt == r_vci_cmd_max)
                     {
                         r_vci_cmd_fsm = CMD_IDLE;
-                        TO BE COMPLETED
+                        r_wbuf.sent(); // Send the transaction to the write buffer
                     }
                 }
                 break;
