@@ -480,7 +480,7 @@ namespace soclib
             //////////////////////
             case DCACHE_WRITE_REQ: // only cacheable write are written in wbuf
             {
-                if (/* TODO:  */)
+                if (!r_wbuf.write(r_dcache_addr_save.read(), r_dcache_be_save.read(), r_dcache_wdata_save.read(), true))
                 {
                     //  stay in DCACHE_WRITEREQ state if the request is not accepted
                     m_cost_write_frz++;
@@ -744,7 +744,7 @@ namespace soclib
             /////////////////////
             case DCACHE_XTN_SYNC: // waiting write buffer empty
             {
-                if (/* TODO:  */)
+                if (r_wbuf.empty())
                 {
                     r_dcache_fsm = DCACHE_IDLE;
                     m_drsp.valid = true;
@@ -878,15 +878,15 @@ namespace soclib
                 if (p_vci.rspval.read())
                 {
                     r_vci_rsp_cpt = 0;
-                    if (/* TODO:  */)
+                    if ((p_vci.rtrdid.read() >> (vci_param::T - 1)) != 0)
                         r_vci_rsp_fsm = RSP_DATA_WRITE;
-                    else if (/* TODO:  */)
+                    else if (p_vci.rtrdid.read() == TYPE_DATA_MISS)
                         r_vci_rsp_fsm = RSP_DATA_MISS;
-                    else if (/* TODO:  */)
+                    else if (p_vci.rtrdid.read() == TYPE_DATA_UNC)
                         r_vci_rsp_fsm = RSP_DATA_UNC;
-                    else if (/* TODO:  */)
+                    else if (p_vci.rtrdid.read() == TYPE_INS_MISS)
                         r_vci_rsp_fsm = RSP_INS_MISS;
-                    else if (/* TODO:  */)
+                    else if (p_vci.rtrdid.read() == TYPE_INS_UNC)
                         r_vci_rsp_fsm = RSP_INS_UNC;
                 }
                 break;
@@ -896,9 +896,8 @@ namespace soclib
                 if (p_vci.rspval.read())
                 {
                     assert(p_vci.reop.read() && "A VCI response packet must contain one flit for a write transaction");
-
                     r_vci_rsp_fsm = RSP_IDLE;
-                    /* TODO:  */
+                    r_wbuf.completed(p_vci.rtrdid.read() - (1 << (vci_param::T - 1)));
                     if ((p_vci.rerror.read() & 0x1) == 0x1)
                         m_iss.setWriteBerr();
                 }
@@ -920,8 +919,8 @@ namespace soclib
                                "The VCI response packet for instruction miss is too long");
 
                         r_vci_rsp_cpt         = r_vci_rsp_cpt + 1;
-                        vci_rsp_fifo_ins_put  = /* TODO:  */;
-                        vci_rsp_fifo_ins_data = /* TODO:  */;
+                        vci_rsp_fifo_ins_put  = true;
+                        vci_rsp_fifo_ins_data = p_vci.rdata.read();
                         if (p_vci.reop.read())
                         {
                             assert((r_vci_rsp_cpt == m_icache_words - 1) &&
@@ -945,8 +944,8 @@ namespace soclib
                     }
                     else if (r_vci_rsp_fifo_ins.wok()) // fifo not full
                     {
-                        vci_rsp_fifo_ins_put  = /* TODO:  */;
-                        vci_rsp_fifo_ins_data = /* TODO:  */;
+                        vci_rsp_fifo_ins_put  = true;
+                        vci_rsp_fifo_ins_data = p_vci.rdata.read();
                         r_vci_rsp_fsm         = RSP_IDLE;
                     }
                 }
@@ -966,9 +965,9 @@ namespace soclib
                     {
                         assert((r_vci_rsp_cpt < m_dcache_words) && "The VCI response packet for data miss is too long");
 
-                        r_vci_rsp_cpt         = r_vci_rsp_cpt + 1;
-                        vci_rsp_fifo_ins_put  = /* TODO:  */;
-                        vci_rsp_fifo_ins_data = /* TODO:  */;
+                        r_vci_rsp_cpt          = r_vci_rsp_cpt + 1;
+                        vci_rsp_fifo_data_put  = true;
+                        vci_rsp_fifo_data_data = p_vci.rdata.read();
                         if (p_vci.reop.read())
                         {
                             assert((r_vci_rsp_cpt == m_dcache_words - 1) &&
@@ -992,8 +991,8 @@ namespace soclib
                     }
                     else if (r_vci_rsp_fifo_data.wok()) // fifo not full
                     {
-                        vci_rsp_fifo_data_put  = /* TODO:  */;
-                        vci_rsp_fifo_data_data = /* TODO:  */;
+                        vci_rsp_fifo_data_put  = true;
+                        vci_rsp_fifo_data_data = p_vci.rdata.read();
                         r_vci_rsp_fsm          = RSP_IDLE;
                     }
                 }
@@ -1045,7 +1044,7 @@ namespace soclib
                 p_vci.plen    = (r_vci_cmd_max - r_vci_cmd_min + 1) << 2;
                 p_vci.cmd     = vci_param::CMD_WRITE;
                 p_vci.pktid   = 0;
-                p_vci.trdid   = /* TODO:  */;
+                p_vci.trdid   = r_wbuf.getIndex() + (1 << (vci_param::T - 1));
                 p_vci.srcid   = m_srcid;
                 p_vci.cons    = false;
                 p_vci.wrap    = false;
@@ -1062,7 +1061,7 @@ namespace soclib
                 p_vci.plen    = m_dcache_words << 2;
                 p_vci.cmd     = vci_param::CMD_READ;
                 p_vci.pktid   = 0;
-                p_vci.trdid   = /* TODO:  */;
+                p_vci.trdid   = TYPE_DATA_MISS;
                 p_vci.srcid   = m_srcid;
                 p_vci.cons    = false;
                 p_vci.wrap    = false;
@@ -1102,7 +1101,7 @@ namespace soclib
                 }
                 p_vci.plen   = 4;
                 p_vci.pktid  = 0;
-                p_vci.trdid  = /* TODO:  */;
+                p_vci.trdid  = TYPE_DATA_UNC;
                 p_vci.srcid  = m_srcid;
                 p_vci.cons   = false;
                 p_vci.wrap   = false;
@@ -1119,7 +1118,7 @@ namespace soclib
                 p_vci.plen    = m_icache_words << 2;
                 p_vci.cmd     = vci_param::CMD_READ;
                 p_vci.pktid   = 0;
-                p_vci.trdid   = /* TODO:  */;
+                p_vci.trdid   = TYPE_INS_MISS;
                 p_vci.srcid   = m_srcid;
                 p_vci.cons    = false;
                 p_vci.wrap    = false;
@@ -1136,7 +1135,7 @@ namespace soclib
                 p_vci.plen    = 4;
                 p_vci.cmd     = vci_param::CMD_READ;
                 p_vci.pktid   = 0;
-                p_vci.trdid   = /* TODO:  */;
+                p_vci.trdid   = TYPE_INS_UNC;
                 p_vci.srcid   = m_srcid;
                 p_vci.cons    = false;
                 p_vci.wrap    = false;
