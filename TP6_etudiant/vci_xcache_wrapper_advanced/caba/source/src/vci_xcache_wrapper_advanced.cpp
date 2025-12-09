@@ -56,11 +56,11 @@ namespace soclib
             };
         } // namespace
 
-#define tmpl(...) template <typename vci_param, typename iss_t> __VA_ARGS__ VciXcacheWrapperAdvanced<vci_param, iss_t>
+#define tmpl(...) template <typename vci_param, typename iss_t> __VA_ARGS__ VciXcacheWrapperMulti<vci_param, iss_t>
 
         using soclib::common::uint32_log2;
 
-        /////////////////////////////////////
+        //////////////////////////////////
         tmpl(/**/)::VciXcacheWrapperAdvanced(sc_module_name name, int proc_id, const soclib::common::MappingTable& mt,
                                              const soclib::common::IntTab& index, size_t icache_ways,
                                              size_t icache_sets, size_t icache_words, size_t dcache_ways,
@@ -123,7 +123,7 @@ namespace soclib
             m_iss.setCacheInfo(cache_info);
         }
 
-        ///////////////////////////////////////
+        ////////////////////////////////////
         tmpl(/**/)::~VciXcacheWrapperAdvanced() {}
 
         ///////////////////////////////////////
@@ -266,7 +266,6 @@ namespace soclib
                 m_cost_data_miss_frz = 0;
                 m_cost_data_unc_frz  = 0;
                 m_cost_ins_miss_frz  = 0;
-                m_cost_ins_unc_frz   = 0;
 
                 m_length_write_transaction = 0;
                 m_count_write_transaction  = 0;
@@ -313,8 +312,8 @@ namespace soclib
             case ICACHE_IDLE: {
                 if (m_ireq.valid)
                 {
-                    data_t icache_ins;
-                    bool icache_hit;
+                    data_t icache_ins = 0;
+                    bool icache_hit   = false;
 
                     m_cpt_icache_read++;
 
@@ -341,8 +340,8 @@ namespace soclib
                     }
                     else // non cacheable
                     {
-                        m_cpt_ins_unc++;
-                        m_cost_ins_unc_frz++;
+                        m_cpt_ins_miss++;
+                        m_cost_ins_miss_frz++;
 
                         r_icache_addr_save = m_ireq.addr;
                         r_icache_fsm       = ICACHE_UNC_WAIT;
@@ -445,10 +444,10 @@ namespace soclib
             //   or a cacheable write.
             // - In WRITE_REQ state, the request is satisfied if it is a cacheable read hit,
             //   or a cacheable write, only if the write buffer is not full.
-            // - Both the uncacheable read and the uncachable write requests block the processor
-            //   until the corresponding VCI transaction is completed.
+            // - Both the uncacheable read and the uncachable write requests block the
+            //   processor until the corresponding VCI transaction is completed.
             //
-            // It uses an advanced Write buffer that supports several simultaneous write bursts.
+            // It uses an advanced Write buffer supporting simultaneous write bursts.
             //
             // In case of processor request, there is six conditions to exit the IDLE state:
             //   - CACHED READ MISS       => to the MISS_SELECT state,
@@ -468,7 +467,7 @@ namespace soclib
             //   by the DCACHE FSM.
             // - If a Write Bus Error is detected, the VCI_RSP FSM  signals
             //   the asynchronous error using the setWriteBerr() method.
-            ////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////
 
             // default value for m_drsp
             m_drsp.valid = false;
@@ -507,8 +506,7 @@ namespace soclib
                     dcache_cacheable = m_cacheability_table[(uint64_t)m_dreq.addr];
 
                     // dcache_hit, dcache_way, dcache_set, dcache_word & dcache_rdata evaluation
-                    dcache_hit =
-                        r_dcache.read(m_dreq.addr, &dcache_hit, &dcache_way, &dcache_set, &dcache_word, &dcache_rdata);
+                    dcache_hit = r_dcache.read(m_dreq.addr, &dcache_rdata, &dcache_way, &dcache_set, &dcache_word);
 
                     // Save proc request and cache response
                     r_dcache_addr_save      = m_dreq.addr;
@@ -577,6 +575,7 @@ namespace soclib
                                 m_cpt_write_cached++;
 
                                 m_drsp.rdata = 0;
+                                m_drsp.valid = true;
                                 r_dcache_fsm = DCACHE_WRITE_UPDT;
                             }
                         }
@@ -801,12 +800,12 @@ namespace soclib
             case CMD_IDLE: {
                 size_t min;
                 size_t max;
-                if (r_dcache_miss_req.read() && r_wbuf.miss(r_dcache_addr_save.read()))
+                if ((r_dcache_miss_req.read()) && (r_wbuf.miss(r_dcache_addr_save.read())))
                 {
                     r_vci_cmd_fsm     = CMD_DATA_MISS;
                     r_dcache_miss_req = false;
                 }
-                else if (r_icache_miss_req.read() && r_wbuf.miss(r_icache_addr_save.read()))
+                else if ((r_icache_miss_req.read()) && (r_wbuf.miss(r_icache_addr_save.read())))
                 {
                     r_vci_cmd_fsm     = CMD_INS_MISS;
                     r_icache_miss_req = false;
@@ -840,7 +839,7 @@ namespace soclib
                     if (r_vci_cmd_cpt == r_vci_cmd_max)
                     {
                         r_vci_cmd_fsm = CMD_IDLE;
-                        r_wbuf.sent(); // Send the transaction to the write buffer
+                        r_wbuf.sent();
                     }
                 }
                 break;
@@ -917,7 +916,6 @@ namespace soclib
                     {
                         assert((r_vci_rsp_cpt < m_icache_words) &&
                                "The VCI response packet for instruction miss is too long");
-
                         r_vci_rsp_cpt         = r_vci_rsp_cpt + 1;
                         vci_rsp_fifo_ins_put  = true;
                         vci_rsp_fifo_ins_data = p_vci.rdata.read();
@@ -936,7 +934,6 @@ namespace soclib
                 if (p_vci.rspval.read())
                 {
                     assert(p_vci.reop.read() and "illegal VCI response for uncached instruction");
-
                     if ((p_vci.rerror.read() & 0x1 != 0)) // error reported
                     {
                         r_vci_rsp_ins_error = true;
@@ -964,7 +961,6 @@ namespace soclib
                     else if (r_vci_rsp_fifo_data.wok()) // fifo not full
                     {
                         assert((r_vci_rsp_cpt < m_dcache_words) && "The VCI response packet for data miss is too long");
-
                         r_vci_rsp_cpt          = r_vci_rsp_cpt + 1;
                         vci_rsp_fifo_data_put  = true;
                         vci_rsp_fifo_data_data = p_vci.rdata.read();
@@ -983,7 +979,6 @@ namespace soclib
                 if (p_vci.rspval.read())
                 {
                     assert(p_vci.reop.read() and "illegal VCI response for uncached data");
-
                     if ((p_vci.rerror.read() & 0x1 != 0)) // error reported
                     {
                         r_vci_rsp_data_error = true;
