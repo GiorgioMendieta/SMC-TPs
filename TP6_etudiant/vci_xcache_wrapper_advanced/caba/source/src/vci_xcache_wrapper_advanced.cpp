@@ -56,7 +56,7 @@ namespace soclib
             };
         } // namespace
 
-#define tmpl(...) template <typename vci_param, typename iss_t> __VA_ARGS__ VciXcacheWrapperMulti<vci_param, iss_t>
+#define tmpl(...) template <typename vci_param, typename iss_t> __VA_ARGS__ VciXcacheWrapperAdvanced<vci_param, iss_t>
 
         using soclib::common::uint32_log2;
 

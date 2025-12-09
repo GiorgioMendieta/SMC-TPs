@@ -1,6 +1,6 @@
 # -*- python -*-
 
-todo = Platform('caba', 'tp6_top.cpp',
+todo = Platform('caba', 'tp6_top_advanced.cpp',
         uses = [
             Uses('caba:vci_xcache_wrapper_advanced', iss_t = 'common:mips32el'),
             Uses('caba:vci_vgmn'),

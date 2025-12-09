@@ -49,7 +49,7 @@
 #include "vci_simple_ram.h"
 #include "vci_timer.h"
 #include "vci_vgmn.h"
-#include "vci_xcache_wrapper.h"
+#include "vci_xcache_wrapper_advanced.h"
 
 #define SEG_RESET_BASE 0xBFC00000
 #define SEG_RESET_SIZE 0x00001000
@@ -290,10 +290,13 @@ int _main(int argc, char* argv[])
 
     Loader loader(sys_path, app_path);
 
+    int wbuf_nwords = 4;
+    int wbuf_nlines = 8;
+
     VciXcacheWrapperAdvanced<vci_param, Mips32ElIss>* proc;
     proc = new VciXcacheWrapperAdvanced<vci_param, Mips32ElIss>("proc", 0, maptab, IntTab(SRCID_PROC), icache_ways,
                                                                 icache_sets, icache_words, dcache_ways, dcache_sets,
-                                                                dcache_words);
+                                                                dcache_words, wbuf_nwords, wbuf_nlines);
 
     VciSimpleRam<vci_param>* rom;
     rom = new VciSimpleRam<vci_param>("rom", IntTab(TGTID_ROM), maptab, loader);
